@@ -534,6 +534,38 @@
     },
 
     {
+      "_comment": "Three 0-cost cards from Claude, so the Portal Ruins has a pool to draw from (it also draws Soul Tax and Abyssal Pact). They show up in rewards and the shop too. Ben: change or cut anything.",
+      "id": "flicker",
+      "name": "Flicker",
+      "school": "elemental",
+      "rarity": "common",
+      "cost": 0,
+      "text": "Deal 4 damage.",
+      "effects": [{ "type": "damage", "target": "enemy", "amount": 4 }],
+      "upgrade": { "text": "Deal 6 damage.", "effects": [{ "type": "damage", "target": "enemy", "amount": 6 }] }
+    },
+    {
+      "id": "grave_whisper",
+      "name": "Grave Whisper",
+      "school": "necromancy",
+      "rarity": "uncommon",
+      "cost": 0,
+      "text": "All your summons gain +1 attack for this fight.",
+      "effects": [{ "type": "buffSummons", "stat": "attack", "amount": 1 }],
+      "upgrade": { "text": "All your summons gain +2 attack for this fight.", "effects": [{ "type": "buffSummons", "stat": "attack", "amount": 2 }] }
+    },
+    {
+      "id": "bloodletting",
+      "name": "Bloodletting",
+      "school": "darkhold",
+      "rarity": "common",
+      "cost": 0,
+      "text": "Lose 3 HP. Gain 1 energy.",
+      "effects": [{ "type": "loseHealth", "amount": 3 }, { "type": "energy", "amount": 1 }],
+      "upgrade": { "text": "Lose 2 HP. Gain 1 energy.", "effects": [{ "type": "loseHealth", "amount": 2 }, { "type": "energy", "amount": 1 }] }
+    },
+
+    {
       "_comment": "An event card from the Ancient Tree. Rarity \"event\" keeps it out of rewards and the shop. While it's in your deck, a rest site offers its atRest action instead of resting or upgrading.",
       "id": "bound_wood_sapling",
       "name": "Bound Wood Sapling",

@@ -104,6 +104,15 @@
         { "type": "status", "target": "allEnemies", "status": "tangled", "amount": 1, "lastsTheFight": true },
         { "type": "damage", "target": "allEnemies", "amount": 6 }
       ]
+    },
+    {
+      "_comment": "From the Portal Ruins event only.",
+      "id": "portal_remains",
+      "name": "Portal Remains",
+      "rarity": "rare",
+      "eventOnly": true,
+      "text": "Whenever you play a 0-cost card, draw a card.",
+      "onCardPlayed": { "cost": 0, "effects": [{ "type": "draw", "amount": 1 }] }
     }
   ]
 }

@@ -140,7 +140,8 @@ function breathStat(run, { button } = {}) {
 // Companions ride in the HUD as small seals in their school's color; a tap opens their sheet.
 function medallion(data, id) {
   const companion = data.companionsById[id];
-  return `<span class="medallion" style="--school: var(--school-${esc(companion.school)}, var(--school-neutral))" title="${esc(companion.name)}"><svg aria-hidden="true"><use href="#sigil-${esc(companion.school)}"/></svg></span>`;
+  const glyph = companion.icon ?? `sigil-${companion.school}`; // a companion can bring its own seal (the King's crown)
+  return `<span class="medallion" style="--school: var(--school-${esc(companion.school)}, var(--school-neutral))" title="${esc(companion.name)}"><svg aria-hidden="true"><use href="#${esc(glyph)}"/></svg></span>`;
 }
 
 function alliesStat(data, ids) {

@@ -47,6 +47,12 @@ const RUN_EFFECTS = {
     run.player.hp = Math.min(run.player.hp, run.player.maxHp);
     return { text: `Max HP ${before} → ${run.player.maxHp}.` };
   },
+  // Losing HP outside a fight can kill you too (the Portal Ruins coming down on you).
+  loseHealth: (run, data, effect) => {
+    const before = run.player.hp;
+    run.player.hp = Math.max(0, before - effect.amount);
+    return { text: `You lose ${effect.amount} HP: ${before} → ${run.player.hp}.` };
+  },
   // Paying HP outside a fight can kill you. That's the Blood Wager's whole edge.
   payHealth: (run, data, effect) => {
     const before = run.player.hp;
@@ -70,7 +76,7 @@ const RUN_EFFECTS = {
     return { text: `${data.cardsById[effect.id].name} leaves your deck.` };
   },
   addRandomCard: (run, data, effect) => {
-    const [id] = rollCards(data, 1, { rarity: effect.rarity });
+    const [id] = rollCards(data, 1, { rarity: effect.rarity, cost: effect.cost });
     if (!id) return { text: 'The page crumbles. Nothing to learn.' };
     run.deck.push(newCard(id));
     run.stats.cardsAdded += 1;
@@ -80,11 +86,14 @@ const RUN_EFFECTS = {
   removeCardChoice: () => ({ pick: 'purge' }),
   // A companion you don't have yet. With no room, they wait for you to make room (the Allies sheet).
   gainRandomCompanion: (run, data) => {
-    const strangers = data.companions.companions.filter((c) => !run.companions.includes(c.id));
+    const strangers = data.companions.companions.filter((c) => !c.eventOnly && !run.companions.includes(c.id));
     if (!strangers.length) return { text: 'No one new is here.' };
-    const { id, name } = pickOne(strangers);
-    const joined = hasRoomForCompanion(run, data) && takeCompanion(run, data, id).ok;
-    return { text: joined ? `${name} joins you.` : `${name} wants to come with you.`, companion: id, joined };
+    return meetCompanion(run, data, pickOne(strangers).id);
+  },
+  // A particular companion (the Mysterious King). Companions marked eventOnly only come this way.
+  gainCompanion: (run, data, effect) => {
+    if (run.companions.includes(effect.id)) return { text: `${data.companionsById[effect.id].name} is already with you.` };
+    return meetCompanion(run, data, effect.id);
   },
   grantRunBuff: (run, data, effect) => {
     const buff = data.events.runBuffs[effect.id];
@@ -109,6 +118,13 @@ const RUN_EFFECTS = {
     return { ...takeRelic(run, data, id), relic: id };
   },
 };
+
+// A companion joins if there's room; otherwise they wait on the result screen for you to make room.
+function meetCompanion(run, data, id) {
+  const { name } = data.companionsById[id];
+  const joined = hasRoomForCompanion(run, data) && takeCompanion(run, data, id).ok;
+  return { text: joined ? `${name} joins you.` : `${name} wants to come with you.`, companion: id, joined };
+}
 
 export const runEffectBuilt = (effect) => Boolean(RUN_EFFECTS[effect.type]);
 

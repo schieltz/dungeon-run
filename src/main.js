@@ -119,6 +119,7 @@ function checkData(data) {
       if (!runEffectBuilt(effect)) problems.push(`${where} uses "${effect.type}", which isn't in the game.`);
       if (['addCurse', 'addCard', 'removeCard'].includes(effect.type)) card(effect.id, where);
       if (effect.type === 'gainRelic' && effect.id && !data.relicsById[effect.id]) problems.push(`${where} gives relic "${effect.id}", but relics.json has no relic with that id.`);
+      if (effect.type === 'gainCompanion' && !data.companionsById[effect.id]) problems.push(`${where} brings companion "${effect.id}", but companions.json has none with that id.`);
       if (effect.type === 'grantRunBuff' && !data.events.runBuffs?.[effect.id]) problems.push(`${where} grants "${effect.id}", but runBuffs has nothing by that name.`);
     }
   }
@@ -403,7 +404,7 @@ function takeOffer() {
 
 // Events: paying HP outside a fight can kill you, so a step that would takes a second tap.
 const wouldBleedOut = (effects) =>
-  effects.some((effect) => effect.type === 'payHealth' && effect.amount >= app.run.player.hp);
+  effects.some((effect) => ['payHealth', 'loseHealth'].includes(effect.type) && effect.amount >= app.run.player.hp);
 
 // After any step of an event: a "remove a card" choice opens the picker; a companion with no room waits
 // on the result screen; bleeding out ends the run where it stands.

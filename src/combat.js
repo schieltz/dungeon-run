@@ -56,6 +56,11 @@ function fightStartEffects(combat, run) {
     if (buff.atFightStart) applyEffects(combat, buff.atFightStart, buff.name);
   }
   strengthen(combat, combat.enemies);
+  // A companion who greets every enemy with a status (the Mysterious King: Weak 1). Applied on your first
+  // turn, so a one-turn status covers the enemies' first turn and is gone by your second.
+  for (const passive of companionPassives(combat, 'enemiesStartWith')) {
+    for (const enemy of combat.enemies) applyStatus(combat, enemy, passive.status, { duration: passive.duration, amount: passive.amount }, passive.companion);
+  }
 }
 
 function strengthen(combat, enemies) {

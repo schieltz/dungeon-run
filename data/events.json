@@ -171,6 +171,38 @@
           ]
         }
       ]
+    },
+
+    {
+      "id": "portal_ruins",
+      "name": "The Portal Ruins",
+      "flavor": "A ring of old stone stands in a collapsed hall, humming. Through it you can see a throne room that is not in this dungeon. Someone on the throne is looking back.",
+      "choices": [
+        {
+          "label": "Go through",
+          "text": "Come back with the Mysterious King and 100 gold. The portal keeps a piece of you: lose 8 max HP.",
+          "effects": [
+            { "type": "gainCompanion", "id": "the_mysterious_king" },
+            { "type": "gainGold", "amount": 100 },
+            { "type": "loseMaxHealth", "amount": 8 }
+          ]
+        },
+        {
+          "label": "Search nearby",
+          "text": "Dig the Portal Remains out of the rubble. The ruins come down on you: take 12 damage.",
+          "effects": [
+            { "type": "loseHealth", "amount": 12 },
+            { "type": "gainRelic", "id": "portal_remains" }
+          ]
+        },
+        {
+          "label": "Reach through",
+          "text": "Grab whatever is closest to the edge: a random 0-cost card for your deck.",
+          "effects": [
+            { "type": "addRandomCard", "cost": 0 }
+          ]
+        }
+      ]
     }
   ]
 }

@@ -79,6 +79,10 @@ const EFFECTS = {
     }
   },
   loseHealth: (ctx, effect) => loseHealth(ctx.combat, ctx.combat.player, effect.amount, ctx.source, { own: true }),
+  // A share of each target's current HP, rounded down (Royal Decree: half). Lost, not damage: block doesn't help.
+  loseHealthFraction: (ctx, effect) => {
+    for (const target of targetsOf(ctx, effect)) loseHealth(ctx.combat, target, floorMul(target.hp, effect.fraction), ctx.source);
+  },
   loseMaxHealth: (ctx, effect) => loseMaxHealth(ctx.combat, effect.amount, ctx.source),
   draw: (ctx, effect) => drawCards(ctx.combat, effect.amount, ctx.source),
   energy: (ctx, effect) => gainEnergy(ctx.combat, effect.amount, ctx.source),
@@ -137,16 +141,20 @@ const EFFECTS = {
   },
 };
 
-// Relics that count the cards you play (Tree Soul): every "count" cards this fight, their effects fire.
-// Counted after a called shot is judged, so the relic's hit never muddles the call.
-function countCardPlayed(combat) {
+// Relics that answer the cards you play. "everyCardsPlayed" fires every "count" cards this fight (Tree Soul);
+// "onCardPlayed" fires for each card of a given cost (Portal Remains: 0-cost cards draw).
+// Counted after a called shot is judged, so a relic's hit never muddles the call.
+function countCardPlayed(combat, card) {
   combat.cardsPlayed = (combat.cardsPlayed ?? 0) + 1;
   for (const id of combat.relics ?? []) {
     const relic = combat.data.relicsById[id];
     const every = relic?.everyCardsPlayed;
-    if (!every || combat.cardsPlayed % every.count !== 0) continue;
-    record(combat, { kind: 'info', text: `${relic.name} stirs: that's ${combat.cardsPlayed} cards played.` });
-    applyEffects(combat, every.effects, relic.name);
+    if (every && combat.cardsPlayed % every.count === 0) {
+      record(combat, { kind: 'info', text: `${relic.name} stirs: that's ${combat.cardsPlayed} cards played.` });
+      applyEffects(combat, every.effects, relic.name);
+    }
+    const each = relic?.onCardPlayed;
+    if (each && card.cost === each.cost) applyEffects(combat, each.effects, relic.name);
   }
 }
 
@@ -272,7 +280,7 @@ export function playCard(combat, cardUid, targetUid, payment, call) {
   const logStart = combat.log.length;
   runEffects(combat, card.effects, { card, source: card.name, target, payment });
   if (call !== undefined && canCallShot(card)) judgeCall(combat, card, target, call, logStart);
-  countCardPlayed(combat);
+  countCardPlayed(combat, card);
 
   // Where the card goes: exhausted cards leave for the fight, powers stay in play, the rest are discarded.
   if (card.exhaust) combat.piles.exhaust.push(instance);
@@ -288,12 +296,13 @@ export function playCard(combat, cardUid, targetUid, payment, call) {
 export const cardPool = (data, rarity) => data.cards.cards.filter((card) => card.rarity === rarity && isBuilt(card));
 
 // Up to `count` different card ids, each rarity picked by weight. `rarity` limits it to one rarity;
-// `weights` swaps in other odds (an elite's better cards).
-export function rollCards(data, count, { rarity, weights: odds } = {}) {
+// `weights` swaps in other odds (an elite's better cards); `cost` keeps only cards of that cost (the
+// Portal Ruins' 0-cost card).
+export function rollCards(data, count, { rarity, weights: odds, cost } = {}) {
   const weights = rarity ? { [rarity]: 1 } : odds ?? data.config.rewards.rarityWeights;
   const picked = [];
   while (picked.length < count) {
-    const remaining = (r) => cardPool(data, r).filter((card) => !picked.includes(card.id));
+    const remaining = (r) => cardPool(data, r).filter((card) => !picked.includes(card.id) && (cost === undefined || card.cost === cost));
     const open = Object.fromEntries(Object.entries(weights).filter(([r]) => !r.startsWith('_') && remaining(r).length));
     const chosen = pickWeighted(open);
     if (!chosen) break;

@@ -184,7 +184,7 @@ export function claimRewards(run, node, data) {
   const cards = rollCards(data, rewards.cardChoiceCount, { weights: elite ? rewards.eliteRarityWeights : undefined });
   const relic = elite ? rollRelic(run, data, pickWeighted(rewards.eliteRelicRarityWeights)) : null;
   if (relic) takeRelic(run, data, relic);
-  const strangers = data.companions.companions.filter((c) => !run.companions.includes(c.id));
+  const strangers = data.companions.companions.filter((c) => !c.eventOnly && !run.companions.includes(c.id));
   const freed = elite && strangers.length && Math.random() < rewards.eliteCompanionChance;
   return { gold, cards, relic, companion: freed ? pickOne(strangers).id : null };
 }

@@ -54,6 +54,24 @@
           { "type": "healFull" }
         ]
       }
+    },
+    {
+      "_comment": "From the Portal Ruins event only (eventOnly): never an elite's prisoner or the Chained Prisoner.",
+      "id": "the_mysterious_king",
+      "name": "The Mysterious King",
+      "school": "neutral",
+      "icon": "icon-crown",
+      "eventOnly": true,
+      "flavor": "He stepped out of the portal wearing a crown no one has ever seen. He says he is the king of this place. The dungeon does not argue.",
+      "passive": {
+        "text": "Every enemy starts each fight Weak 1: it deals 25% less damage on its first turn.",
+        "effect": { "type": "enemiesStartWith", "status": "weak", "duration": 1 }
+      },
+      "sacrifice": {
+        "name": "Royal Decree",
+        "text": "Every enemy loses half its current HP.",
+        "effects": [{ "type": "loseHealthFraction", "target": "allEnemies", "fraction": 0.5 }]
+      }
     }
   ]
 }
