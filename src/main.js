@@ -7,7 +7,7 @@ import { catchUpEnemies, createCombat, endPlayerTurn, freezeCombat, livingEnemie
 import { canCallShot, cardDef, needsPayment, paymentRange, playability, playCard, sacrificeInFight, targetMode } from './cards.js';
 import { assignSummonTarget, livingSummons } from './summons.js';
 import { claimRewards, currentNode, enterNode, FIGHT_TYPES, generateMap, settleFight, takeRewardCard } from './map.js';
-import { buyCard, openShop, removeCard, restHeal, takeRestAction, upgradeCard } from './shop.js';
+import { buyCard, buyRelic, openShop, removeCard, restHeal, takeRestAction, upgradeCard } from './shop.js';
 import {
   bledOut, choiceRequirementBuilt, chooseOption, eventChoices, flipMemoryCard, openEvent, purgeCard, runEffectBuilt, spendFightBuffs,
   wagerDraw, wagerStop,
@@ -231,7 +231,7 @@ function goToNode(id) {
     app.view = { event: openEvent(node.event) };
     app.screen = 'event';
   } else if (node.type === 'shop') {
-    app.view = { shop: openShop(app.data) };
+    app.view = { shop: openShop(app.data, app.run) };
     app.screen = 'shop';
   } else if (node.type === 'rest') app.screen = 'rest';
 }
@@ -546,6 +546,12 @@ const ACTIONS = {
     const result = buyCard(app.run, app.view.shop, app.view.chosen);
     app.ui.message = result.ok ? 'Added to your deck.' : result.reason;
     if (result.ok) app.view.chosen = undefined;
+  },
+  'shop-relic': (el) => {
+    const { shop } = app.view;
+    const item = shop.relics[Number(el.dataset.index)];
+    const result = buyRelic(app.run, app.data, shop, Number(el.dataset.index));
+    app.ui.message = result.ok ? `${app.data.relicsById[item.id].name} is yours.` : result.reason;
   },
   'shop-remove': () => { app.view.picker = { purpose: 'remove' }; },
   leave: toMap,

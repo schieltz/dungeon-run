@@ -68,7 +68,10 @@
 
   "shop": {
     "cardPrice": [40, 75],
-    "relicPrice": [100, 160],
+    "_relicsComment": "The merchant's relics: how many are on the shelf, how often each rarity shows up (bigger = more often), and the price range for each rarity. Never one you already carry, never an event's own relic.",
+    "relicsForSale": 2,
+    "relicRarityWeights": { "common": 55, "uncommon": 35, "rare": 10 },
+    "relicPrice": { "common": [90, 115], "uncommon": [125, 150], "rare": [160, 190] },
     "cardRemovalPrice": 60,
     "cardsForSale": 5
   },

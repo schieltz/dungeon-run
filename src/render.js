@@ -295,7 +295,7 @@ function shopScreen(app) {
       ${runHud(app)}
       <section class="board">
         <h2 class="board-title">The Shop</h2>
-        <p class="board-prompt">A hooded trader with a cart of torn pages. Tap a card to look, then buy.</p>
+        <p class="board-prompt">A hooded trader with a cart of torn pages and a shelf of strange things. Tap a card to look, then buy.</p>
         <div class="card-row">
           ${shop.stock.map((stock, index) => `
             <div class="for-sale ${stock.sold ? 'sold' : ''}">
@@ -303,6 +303,16 @@ function shopScreen(app) {
               <span class="price ${run.gold < stock.price ? 'short' : ''}">${stock.sold ? 'Sold' : `${icon('coin')}<b>${stock.price}</b>`}</span>
             </div>`).join('')}
         </div>
+        ${(shop.relics ?? []).length ? `
+        <div class="relic-shelf">
+          ${shop.relics.map((item, index) => `
+            <div class="relic-for-sale ${item.sold ? 'sold' : ''}">
+              ${relicPlaque(data, item.id)}
+              <button class="plain-button" data-action="shop-relic" data-index="${index}" ${item.sold || run.gold < item.price ? 'disabled' : ''}>
+                ${item.sold ? 'Sold' : `Buy ${icon('coin')}<b>${item.price}</b>`}
+              </button>
+            </div>`).join('')}
+        </div>` : ''}
         <div class="actions">
           <button class="big-button" data-action="shop-buy" ${canBuy ? '' : 'disabled'}>${buyLabel}</button>
           <button class="plain-button" data-action="shop-remove" ${canRemove ? '' : 'disabled'}>

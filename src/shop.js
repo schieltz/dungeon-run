@@ -1,23 +1,48 @@
 // Shop and rest nodes.
 // Prices, heal amounts and stock size all come from data/config.json ("shop", "rewards").
-// Event nodes and their minigames live in events.js. Relics aren't for sale yet (only events give them).
+// Event nodes and their minigames live in events.js.
 
 import { canUpgrade, rollCards } from './cards.js';
-import { floorMul, newCard, randomInt } from './state.js';
-import { runEffects } from './events.js';
+import { floorMul, newCard, pickWeighted, randomInt } from './state.js';
+import { rollRelic, runEffects, takeRelic } from './events.js';
 
 const refused = (reason) => ({ ok: false, reason });
 
 // ---------------------------------------------------------------------------
-// Shop: cards for sale at a price each, and one card removal per visit.
+// Shop: cards for sale at a price each, a shelf of relics priced by rarity, and one card removal per visit.
 
-export function openShop(data) {
+export function openShop(data, run) {
   const { shop } = data.config;
   return {
     stock: rollCards(data, shop.cardsForSale).map((id) => ({ id, price: randomInt(shop.cardPrice), sold: false })),
+    relics: shelfRelics(data, run),
     removalPrice: shop.cardRemovalPrice,
     removalUsed: false,
   };
+}
+
+// Different relics, none you carry and none an event keeps for itself (rollRelic skips those).
+function shelfRelics(data, run) {
+  const { shop } = data.config;
+  const shelf = [];
+  for (let slot = 0; slot < shop.relicsForSale; slot++) {
+    const taken = { relics: [...(run?.relics ?? []), ...shelf.map((item) => item.id)] };
+    const id = rollRelic(taken, data, pickWeighted(shop.relicRarityWeights));
+    if (!id) break;
+    shelf.push({ id, price: randomInt(shop.relicPrice[data.relicsById[id].rarity]), sold: false });
+  }
+  return shelf;
+}
+
+export function buyRelic(run, data, shop, index) {
+  const item = shop.relics?.[index];
+  if (!item || item.sold) return refused('That relic is sold.');
+  if (run.relics.includes(item.id)) return refused('You already carry that.');
+  if (run.gold < item.price) return refused('Not enough gold.');
+  run.gold -= item.price;
+  takeRelic(run, data, item.id);
+  item.sold = true;
+  return { ok: true };
 }
 
 export function buyCard(run, shop, index) {

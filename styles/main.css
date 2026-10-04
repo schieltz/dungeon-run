@@ -1197,6 +1197,11 @@ button.stat:disabled { filter: var(--filter-unlit); }
 .price .icon { width: var(--icon-md); height: var(--icon-md); color: var(--color-flame); }
 .price.short { color: var(--color-blood-bright); }
 .for-sale.sold .price { color: var(--color-text-faint); }
+/* The relic shelf: a plaque each, with its own price and buy button. */
+.relic-shelf { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-5); }
+.relic-for-sale { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); }
+.relic-for-sale .plain-button b { color: var(--color-elemental); }
+.relic-for-sale.sold .relic { filter: var(--filter-unlit); }
 
 /* Rest */
 .choices { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-6); }
