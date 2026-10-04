@@ -1,0 +1,326 @@
+{
+  "_comment": "DUNGEON RUN enemy data. Enemies target the summon with the HIGHEST current HP if any summon is alive, otherwise the player. Exception: ignoresSummons: true or targetPriority overrides. Intent is always telegraphed, including target.",
+
+  "summonTypes": [
+    { "id": "skeleton", "name": "Skeleton", "hp": 10, "attack": 5 },
+    { "id": "bone_wall", "name": "Bone Wall", "hp": 20, "attack": 0 }
+  ],
+
+  "enemies": [
+    {
+      "id": "dungeon_rat",
+      "name": "Dungeon Rat",
+      "hp": 18,
+      "tier": "basic",
+      "intents": [
+        { "type": "attack", "amount": 7 },
+        { "type": "attack", "amount": 7 }
+      ]
+    },
+    {
+      "id": "cave_bat",
+      "name": "Cave Bat",
+      "hp": 22,
+      "tier": "basic",
+      "ignoresSummons": true,
+      "_note": "Flies over the summons. Punishes a player who thinks a wall of bodies solves everything.",
+      "intents": [
+        { "type": "attack", "amount": 5, "times": 2 },
+        { "type": "attack", "amount": 8 }
+      ]
+    },
+    {
+      "id": "bone_skeleton",
+      "name": "Bone Skeleton",
+      "hp": 32,
+      "tier": "basic",
+      "intents": [
+        { "type": "attack", "amount": 10 },
+        { "type": "block", "amount": 8 },
+        { "type": "attack", "amount": 10 }
+      ]
+    },
+    {
+      "id": "torch_wraith",
+      "name": "Torch Wraith",
+      "hp": 26,
+      "tier": "basic",
+      "intents": [
+        { "type": "attack", "amount": 6 },
+        { "type": "status", "status": "weak", "duration": 2, "target": "player" },
+        { "type": "attack", "amount": 8 }
+      ]
+    },
+
+    {
+      "id": "blood_blob",
+      "name": "Blood Blob",
+      "hp": 30,
+      "tier": "basic",
+      "_note": "THE SWARM. Splits on death into two Blood Motes. Punishes single-target-only decks. Split depth is capped at 1 so the fight cannot run forever.",
+      "onDeath": { "type": "split", "into": "blood_mote", "count": 2, "maxSplitDepth": 1 },
+      "intents": [
+        { "type": "attack", "amount": 7 },
+        { "type": "attack", "amount": 7 }
+      ]
+    },
+    {
+      "id": "blood_mote",
+      "name": "Blood Mote",
+      "hp": 12,
+      "tier": "basic",
+      "splitDepth": 1,
+      "intents": [{ "type": "attack", "amount": 4 }]
+    },
+
+    {
+      "id": "goblin_shaman",
+      "name": "Goblin Shaman",
+      "hp": 20,
+      "tier": "basic",
+      "_note": "THE HEALER. Heals every other goblin 6 per turn. Kill it first or nothing you do sticks. Low HP on purpose - this is a targeting puzzle, not a damage check.",
+      "intents": [
+        { "type": "healAllies", "amount": 6 },
+        { "type": "attack", "amount": 4 },
+        { "type": "healAllies", "amount": 6 }
+      ]
+    },
+    {
+      "id": "goblin_shieldbearer",
+      "name": "Goblin Shieldbearer",
+      "hp": 26,
+      "tier": "basic",
+      "_note": "Gives block to its allies, not itself. Makes the Shaman hard to reach.",
+      "intents": [
+        { "type": "blockAllies", "amount": 8 },
+        { "type": "attack", "amount": 5 },
+        { "type": "blockAllies", "amount": 8 }
+      ]
+    },
+    {
+      "id": "goblin_brute",
+      "name": "Goblin Brute",
+      "hp": 34,
+      "tier": "basic",
+      "_note": "The clock. Ignore it and it ends you. Kill it and the Shaman undoes your work.",
+      "intents": [
+        { "type": "attack", "amount": 13 },
+        { "type": "attack", "amount": 13 },
+        { "type": "buffSelf", "stat": "strength", "amount": 2 }
+      ]
+    },
+
+    {
+      "id": "the_leech",
+      "name": "The Leech",
+      "hp": 42,
+      "tier": "basic",
+      "_note": "THE SUMMON-EATER. A sandworm thing that erupts from the floor. Devours summons and heals itself for their full remaining HP. This teaches the Corrupted Crab fight before the player ever reaches it.",
+      "targetPriority": "lowestHpSummon",
+      "intents": [
+        { "type": "devourSummon", "healEqualTo": "summonCurrentHp", "fallback": { "type": "attack", "amount": 12 } },
+        { "type": "attack", "amount": 9 },
+        { "type": "burrow", "text": "Submerges. Takes no damage this turn." },
+        { "type": "devourSummon", "healEqualTo": "summonCurrentHp", "fallback": { "type": "attack", "amount": 12 } }
+      ]
+    },
+
+    {
+      "id": "powder_wretch",
+      "name": "Powder Wretch",
+      "hp": 12,
+      "tier": "basic",
+      "ignoresSummons": true,
+      "_note": "THE GLASS CANNON. 8 HP, hits for 22. Kill it on turn one or take a wound you carry for the rest of the run. Ignores summons - you cannot hide behind a wall.",
+      "intents": [
+        { "type": "charge", "text": "Winding up. Attacks for 22 next turn." },
+        { "type": "attack", "amount": 22 }
+      ]
+    },
+
+    {
+      "id": "iron_torturer",
+      "name": "Iron Torturer",
+      "hp": 70,
+      "tier": "elite",
+      "_note": "ELITE 1. Gains Strength every other turn. The longer the fight runs, the worse it gets.",
+      "intents": [
+        { "type": "attack", "amount": 12 },
+        { "type": "buffSelf", "stat": "strength", "amount": 3 },
+        { "type": "attack", "amount": 12 },
+        { "type": "attack", "amount": 7, "times": 2 }
+      ]
+    },
+
+    {
+      "id": "the_questioner",
+      "name": "THE QUESTIONER",
+      "hp": 75,
+      "tier": "elite",
+      "_note": "ELITE 2. The curse-giver. Deliberately placed at elite tier, not basic - a curse-giver in an early fight would end runs before the player has a deck that can race it. Its tricks are the INVERSE of the crab's: the crab punishes small hits, the Questioner punishes slow play and hoarded energy.",
+      "passives": [
+        {
+          "id": "extract_confession",
+          "name": "Extract Confession",
+          "text": "At the end of each of its turns, shuffles a Doubt curse into your draw pile, but never more than 1 in your deck at a time. Curses you collect here STAY in your deck after the fight.",
+          "_maxInDeckComment": "How many of its curses can be in your deck at once. While that many are there, it adds no more.",
+          "maxInDeck": 1,
+          "type": "addCurseEachTurn",
+          "curseId": "doubt",
+          "persistsAfterFight": true
+        },
+        {
+          "id": "iron_maiden",
+          "name": "Iron Maiden",
+          "text": "If you end your turn with unspent energy, take 10 damage.",
+          "type": "punishUnspentEnergy",
+          "damage": 10
+        }
+      ],
+      "intents": [
+        { "type": "attack", "amount": 10 },
+        { "type": "status", "status": "frail", "duration": 2, "target": "player" },
+        { "type": "attack", "amount": 8, "times": 2 },
+        { "type": "attack", "amount": 10 }
+      ]
+    },
+
+    {
+      "_comment": "Enemies from here to the Dungeon Hound were added by Claude at the producer's request (more enemies, a third elite). Ben: tune or replace.",
+      "id": "cellar_spider",
+      "name": "Cellar Spider",
+      "hp": 20,
+      "tier": "basic",
+      "intents": [
+        { "type": "attack", "amount": 3, "times": 3 },
+        { "type": "attack", "amount": 7 }
+      ]
+    },
+    {
+      "id": "ghoul",
+      "name": "Ghoul",
+      "hp": 30,
+      "tier": "basic",
+      "_note": "Goes for your weakest summon.",
+      "targetPriority": "lowestHpSummon",
+      "intents": [
+        { "type": "attack", "amount": 5, "times": 2 },
+        { "type": "attack", "amount": 11 }
+      ]
+    },
+    {
+      "id": "hooded_acolyte",
+      "name": "Hooded Acolyte",
+      "hp": 30,
+      "tier": "basic",
+      "_note": "Marks you, so everything hits you harder, then patches up its friends.",
+      "intents": [
+        { "type": "status", "status": "marked", "duration": 2, "target": "player" },
+        { "type": "attack", "amount": 9 },
+        { "type": "healAllies", "amount": 7 }
+      ]
+    },
+    {
+      "id": "kennel_master",
+      "name": "THE KENNEL MASTER",
+      "hp": 80,
+      "tier": "elite",
+      "_note": "ELITE 3. Lets his hounds off the chain. Kill him and the hounds go with him.",
+      "fightEndsOnDeath": true,
+      "intents": [
+        { "type": "summon", "id": "dungeon_hound", "count": 1 },
+        { "type": "attack", "amount": 12 },
+        { "type": "summon", "id": "dungeon_hound", "count": 1 },
+        { "type": "attack", "amount": 8, "times": 2 },
+        { "type": "buffSelf", "stat": "strength", "amount": 2 }
+      ]
+    },
+    {
+      "id": "dungeon_hound",
+      "name": "Dungeon Hound",
+      "hp": 14,
+      "tier": "minion",
+      "attackForReanimate": 6,
+      "intents": [
+        { "type": "attack", "amount": 6 }
+      ]
+    },
+
+    {
+      "id": "barnacle",
+      "name": "Barnacle",
+      "hp": 9,
+      "tier": "minion",
+      "attackForReanimate": 6,
+      "intents": [{ "type": "attack", "amount": 6 }]
+    },
+
+    {
+      "id": "corrupted_crab",
+      "name": "CORRUPTED CRAB",
+      "hp": 120,
+      "tier": "boss",
+      "_fightEndsComment": "true: when this one dies, the fight is over. Its minions fall with it.",
+      "_requiresComment": "An intent with requires: armorBroken only happens once Encrusted Armor is gone; until then it does its fallback instead.",
+      "fightEndsOnDeath": true,
+      "_note": "Designed by Ben. Encrusted Armor counts HITS, not damage - deliberate, so one big Golden Light cannot erase the mechanic.",
+      "passives": [
+        {
+          "id": "encrusted_armor",
+          "name": "Encrusted Armor",
+          "text": "Takes half damage from the first 5 hits of the fight. Then the barnacles fall off and the armor breaks permanently.",
+          "type": "damageReduction",
+          "multiplier": 0.5,
+          "hitsRemaining": 5,
+          "countsHitsNotDamage": true
+        }
+      ],
+      "timedAbilities": [
+        {
+          "id": "corrupting_beam",
+          "name": "Corrupting Beam",
+          "everyNTurns": 3,
+          "text": "The shard fires. Steals one of your summons PERMANENTLY: it fights for the crab now. If you have no summons, hits you for 18.",
+          "effect": { "type": "stealSummon", "permanent": true, "fallbackDamageToPlayer": 18 }
+        }
+      ],
+      "intents": [
+        { "type": "attack", "amount": 11 },
+        { "type": "summon", "id": "barnacle", "count": 2, "requires": "armorBroken", "fallback": { "type": "idle", "label": "Barnacles cling", "text": "The barnacles cling to its shell. Nothing comes loose." } },
+        { "type": "attack", "amount": 8, "times": 2 },
+        { "type": "attack", "amount": 14 },
+        { "type": "summon", "id": "barnacle", "count": 1, "requires": "armorBroken", "fallback": { "type": "idle", "label": "Barnacles cling", "text": "The barnacles cling to its shell. Nothing comes loose." } },
+        { "type": "attack", "amount": 11 }
+      ]
+    }
+  ],
+
+  "encounters": [
+    { "id": "e1", "tier": "easy", "enemies": ["dungeon_rat", "dungeon_rat"] },
+    { "id": "e2", "tier": "easy", "enemies": ["cave_bat", "cellar_spider"] },
+    { "id": "e3", "tier": "easy", "enemies": ["cave_bat"] },
+    { "id": "e4", "tier": "easy", "enemies": ["blood_blob"] },
+    { "id": "e5", "tier": "medium", "enemies": ["bone_skeleton", "dungeon_rat"] },
+    { "id": "e6", "tier": "medium", "enemies": ["cave_bat", "dungeon_rat"] },
+    { "id": "e7", "tier": "medium", "enemies": ["torch_wraith", "powder_wretch"] },
+    { "id": "e8", "tier": "medium", "enemies": ["blood_blob", "dungeon_rat"] },
+    { "id": "e9", "tier": "medium", "enemies": ["the_leech"] },
+    { "id": "e10", "tier": "hard", "enemies": ["goblin_shaman", "goblin_brute"] },
+    { "id": "e11", "tier": "hard", "enemies": ["goblin_shaman", "goblin_shieldbearer", "goblin_brute"] },
+    { "id": "e12", "tier": "hard", "enemies": ["bone_skeleton", "torch_wraith"] },
+    { "id": "e13", "tier": "hard", "enemies": ["the_leech", "powder_wretch"] },
+    { "id": "e14", "tier": "hard", "enemies": ["blood_blob", "blood_blob"] },
+    { "id": "elite1", "tier": "elite", "enemies": ["iron_torturer"] },
+    { "id": "e15", "tier": "easy", "enemies": ["cellar_spider", "cellar_spider"] },
+    { "id": "e16", "tier": "easy", "enemies": ["cellar_spider", "dungeon_rat"] },
+    { "id": "e17", "tier": "medium", "enemies": ["ghoul", "cellar_spider"] },
+    { "id": "e18", "tier": "medium", "enemies": ["ghoul", "cave_bat"] },
+    { "id": "e19", "tier": "medium", "enemies": ["cellar_spider", "torch_wraith"] },
+    { "id": "e20", "tier": "hard", "enemies": ["hooded_acolyte", "goblin_brute"] },
+    { "id": "e21", "tier": "hard", "enemies": ["hooded_acolyte", "ghoul"] },
+    { "id": "e22", "tier": "hard", "enemies": ["ghoul", "ghoul"] },
+    { "id": "elite2", "tier": "elite", "enemies": ["the_questioner"] },
+    { "id": "elite3", "tier": "elite", "enemies": ["kennel_master"] },
+    { "id": "boss", "tier": "boss", "enemies": ["corrupted_crab"] }
+  ]
+}

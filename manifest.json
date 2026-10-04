@@ -1,0 +1,19 @@
+{
+  "_comment": "PWA manifest: what the game looks like installed on a home screen. The two colors are the background in data/config.json \"palette\" (a manifest can't read config, so the test suite checks they match).",
+  "name": "Dungeon Run",
+  "short_name": "Dungeon Run",
+  "description": "A turn-based roguelike deckbuilder. A sorcerer, a forbidden book, and the king's dungeon.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0d0b0a",
+  "theme_color": "#0d0b0a",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

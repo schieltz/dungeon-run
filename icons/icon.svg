@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Dungeon Run's home-screen icon: the sorcerer in torchlight. Colors are the palette in data/config.json.
+       The PNGs beside it are rendered from this file (iPadOS won't use an SVG on the home screen). -->
+  <defs>
+    <radialGradient id="light" cx="50%" cy="38%" r="70%">
+      <stop offset="0" stop-color="#e8a33d" stop-opacity="0.42"/>
+      <stop offset="0.35" stop-color="#e8a33d" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#0d0b0a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="book" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#8b5cf6" stop-opacity="0.65"/>
+      <stop offset="1" stop-color="#8b5cf6" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="stone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2a2521"/>
+      <stop offset="1" stop-color="#0d0b0a"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#stone)"/>
+  <rect width="512" height="512" fill="url(#light)"/>
+  <path d="M0 420 L512 420" stroke="#0d0b0a" stroke-width="3" opacity="0.6"/>
+  <circle cx="256" cy="340" r="120" fill="url(#book)"/>
+  <g transform="translate(136 112) scale(2.4)">
+    <path d="M50 6 C35 8 27 26 27 44 C27 55 25 63 21 72 L9 136 L91 136 L79 72 C75 63 73 55 73 44 C73 26 65 8 50 6 Z" fill="#72667a"/>
+    <path d="M50 21 C40 21 35 33 36 45 C37 55 43 60 50 60 C57 60 63 55 64 45 C65 33 60 21 50 21 Z" fill="#080706"/>
+    <circle cx="44.5" cy="44" r="2.6" fill="#e8a33d"/>
+    <circle cx="55.5" cy="44" r="2.6" fill="#e8a33d"/>
+    <path d="M33 80 L50 85 L67 80 L67 100 L50 105 L33 100 Z" fill="#080706" stroke="#8b5cf6" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M50 85 L50 105" stroke="#8b5cf6" stroke-width="2"/>
+    <path d="M41 88 L41 97 M59 88 L59 97" stroke="#8b5cf6" stroke-width="1.5" opacity="0.7"/>
+    <path d="M22 76 C27 86 33 92 36 94 L34 102 C27 98 20 90 17 82 Z M78 76 C73 86 67 92 64 94 L66 102 C73 98 80 90 83 82 Z" fill="#72667a"/>
+  </g>
+</svg>

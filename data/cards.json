@@ -1,0 +1,541 @@
+{
+  "_comment": "DUNGEON RUN card data. Ben: change any number here and the game changes. No code required. Baseline: 1 energy = 6 damage, or 1 energy = 5 block. Anything better than baseline should cost you something.",
+
+  "startingDeck": ["arcane_bolt", "arcane_bolt", "arcane_bolt", "arcane_bolt", "ward", "ward", "ward", "ward", "reanimate", "siphon"],
+
+  "cards": [
+    {
+      "id": "arcane_bolt",
+      "name": "Arcane Bolt",
+      "school": "neutral",
+      "rarity": "starter",
+      "cost": 1,
+      "text": "Deal 6 damage.",
+      "effects": [{ "type": "damage", "target": "enemy", "amount": 6 }],
+      "upgrade": { "text": "Deal 9 damage.", "effects": [{ "type": "damage", "target": "enemy", "amount": 9 }] }
+    },
+    {
+      "id": "ward",
+      "name": "Ward",
+      "school": "neutral",
+      "rarity": "starter",
+      "cost": 1,
+      "text": "Gain 5 block.",
+      "effects": [{ "type": "block", "amount": 5 }],
+      "upgrade": { "text": "Gain 8 block.", "effects": [{ "type": "block", "amount": 8 }] }
+    },
+
+    {
+      "id": "reanimate",
+      "name": "Reanimate",
+      "school": "necromancy",
+      "rarity": "starter",
+      "cost": 1,
+      "text": "Pay X health. Raise the last enemy that died this fight with 2X HP. It attacks for half its original attack, rounded down. Unplayable if nothing has died.",
+      "requires": "corpseAvailable",
+      "effects": [{ "type": "reanimate", "hpMultiplier": 2, "attackMultiplier": 0.5, "variableHealthCost": true }],
+      "upgrade": { "text": "Pay X health. Raise with 3X HP.", "effects": [{ "type": "reanimate", "hpMultiplier": 3, "attackMultiplier": 0.5, "variableHealthCost": true }] }
+    },
+    {
+      "id": "raise_skeleton",
+      "name": "Raise Skeleton",
+      "school": "necromancy",
+      "rarity": "common",
+      "cost": 2,
+      "text": "Summon a Skeleton (10 HP, 5 attack).",
+      "effects": [{ "type": "summon", "id": "skeleton" }],
+      "upgrade": { "cost": 1, "text": "Summon a Skeleton (10 HP, 5 attack).", "effects": [{ "type": "summon", "id": "skeleton" }] }
+    },
+    {
+      "id": "bone_rattle",
+      "name": "Bone Rattle",
+      "school": "necromancy",
+      "rarity": "common",
+      "cost": 1,
+      "text": "Deal 4 damage to ALL enemies.",
+      "effects": [{ "type": "damage", "target": "allEnemies", "amount": 4 }],
+      "upgrade": { "text": "Deal 6 damage to ALL enemies.", "effects": [{ "type": "damage", "target": "allEnemies", "amount": 6 }] }
+    },
+    {
+      "id": "corpse_wall",
+      "name": "Corpse Wall",
+      "school": "necromancy",
+      "rarity": "common",
+      "cost": 2,
+      "text": "Summon 2 Bone Walls (20 HP, 0 attack).",
+      "effects": [{ "type": "summon", "id": "bone_wall", "count": 2 }],
+      "upgrade": { "text": "Summon 3 Bone Walls (20 HP, 0 attack).", "effects": [{ "type": "summon", "id": "bone_wall", "count": 3 }] }
+    },
+    {
+      "id": "bolster",
+      "name": "Bolster",
+      "school": "necromancy",
+      "rarity": "uncommon",
+      "cost": 1,
+      "text": "All your summons gain +3 attack for this fight.",
+      "effects": [{ "type": "buffSummons", "stat": "attack", "amount": 3 }],
+      "upgrade": { "text": "All your summons gain +5 attack for this fight.", "effects": [{ "type": "buffSummons", "stat": "attack", "amount": 5 }] }
+    },
+    {
+      "id": "marrow_shield",
+      "name": "Marrow Shield",
+      "school": "necromancy",
+      "rarity": "uncommon",
+      "cost": 1,
+      "text": "All summons gain 6 HP. Gain 3 block for each summon alive.",
+      "effects": [
+        { "type": "buffSummons", "stat": "hp", "amount": 6 },
+        { "type": "blockPerSummon", "amount": 3 }
+      ],
+      "upgrade": {
+        "text": "All summons gain 9 HP. Gain 4 block for each summon alive.",
+        "effects": [
+          { "type": "buffSummons", "stat": "hp", "amount": 9 },
+          { "type": "blockPerSummon", "amount": 4 }
+        ]
+      }
+    },
+    {
+      "id": "grave_harvest",
+      "name": "Grave Harvest",
+      "school": "necromancy",
+      "rarity": "uncommon",
+      "cost": 1,
+      "text": "Destroy one of your summons. Deal damage equal to its current HP.",
+      "effects": [{ "type": "consumeSummon", "damageEqualTo": "currentHp" }],
+      "upgrade": { "cost": 0, "text": "Destroy one of your summons. Deal damage equal to its current HP.", "effects": [{ "type": "consumeSummon", "damageEqualTo": "currentHp" }] }
+    },
+    {
+      "id": "second_death",
+      "name": "Second Death",
+      "school": "necromancy",
+      "rarity": "rare",
+      "cost": 2,
+      "text": "Power. Whenever one of your summons dies this fight, deal 8 damage to a random enemy.",
+      "effects": [{ "type": "power", "trigger": "summonDeath", "effect": { "type": "damage", "target": "randomEnemy", "amount": 8 } }],
+      "upgrade": { "text": "Power. Whenever one of your summons dies this fight, deal 12 damage to a random enemy.", "effects": [{ "type": "power", "trigger": "summonDeath", "effect": { "type": "damage", "target": "randomEnemy", "amount": 12 } }] }
+    },
+
+    {
+      "id": "siphon",
+      "name": "Siphon",
+      "school": "darkhold",
+      "rarity": "starter",
+      "cost": 1,
+      "text": "Deal 5 damage. Heal 2.",
+      "effects": [
+        { "type": "damage", "target": "enemy", "amount": 5 },
+        { "type": "heal", "amount": 2 }
+      ],
+      "upgrade": {
+        "text": "Deal 7 damage. Heal 3.",
+        "effects": [
+          { "type": "damage", "target": "enemy", "amount": 7 },
+          { "type": "heal", "amount": 3 }
+        ]
+      }
+    },
+    {
+      "id": "steal_life_force",
+      "name": "Steal Life Force",
+      "school": "darkhold",
+      "rarity": "common",
+      "cost": 2,
+      "text": "Deal 10 damage. Heal for half the damage dealt.",
+      "effects": [{ "type": "damage", "target": "enemy", "amount": 10, "lifesteal": 0.5 }],
+      "upgrade": { "text": "Deal 14 damage. Heal for half the damage dealt.", "effects": [{ "type": "damage", "target": "enemy", "amount": 14, "lifesteal": 0.5 }] }
+    },
+    {
+      "id": "soul_tax",
+      "name": "Soul Tax",
+      "school": "darkhold",
+      "rarity": "common",
+      "cost": 0,
+      "text": "Lose 3 HP. Draw 2 cards.",
+      "effects": [
+        { "type": "loseHealth", "amount": 3 },
+        { "type": "draw", "amount": 2 }
+      ],
+      "upgrade": {
+        "text": "Lose 3 HP. Draw 3 cards.",
+        "effects": [
+          { "type": "loseHealth", "amount": 3 },
+          { "type": "draw", "amount": 3 }
+        ]
+      }
+    },
+    {
+      "id": "shackle",
+      "name": "Shackle",
+      "school": "darkhold",
+      "rarity": "common",
+      "cost": 1,
+      "text": "Apply Weak 2 to an enemy. It deals 25% less damage.",
+      "effects": [{ "type": "status", "target": "enemy", "status": "weak", "duration": 2 }],
+      "upgrade": { "text": "Apply Weak 3 to an enemy. It deals 25% less damage.", "effects": [{ "type": "status", "target": "enemy", "status": "weak", "duration": 3 }] }
+    },
+    {
+      "id": "mark_of_rot",
+      "name": "Mark of Rot",
+      "school": "darkhold",
+      "rarity": "uncommon",
+      "cost": 1,
+      "text": "Apply Mark of Rot 2. The enemy takes 50% more damage.",
+      "effects": [{ "type": "status", "target": "enemy", "status": "marked", "duration": 2 }],
+      "upgrade": { "text": "Apply Mark of Rot 3. The enemy takes 50% more damage.", "effects": [{ "type": "status", "target": "enemy", "status": "marked", "duration": 3 }] }
+    },
+    {
+      "id": "rend_soul",
+      "name": "Rend Soul",
+      "school": "darkhold",
+      "rarity": "uncommon",
+      "cost": 2,
+      "text": "Deal 14 damage. Lose 4 HP.",
+      "effects": [
+        { "type": "damage", "target": "enemy", "amount": 14 },
+        { "type": "loseHealth", "amount": 4 }
+      ],
+      "upgrade": {
+        "text": "Deal 18 damage. Lose 4 HP.",
+        "effects": [
+          { "type": "damage", "target": "enemy", "amount": 18 },
+          { "type": "loseHealth", "amount": 4 }
+        ]
+      }
+    },
+    {
+      "id": "darkhold_pact",
+      "name": "Darkhold Pact",
+      "school": "darkhold",
+      "rarity": "rare",
+      "cost": 1,
+      "text": "Gain 2 energy. Take 5 damage at the end of your turn.",
+      "effects": [
+        { "type": "energy", "amount": 2 },
+        { "type": "delayedDamage", "amount": 5, "when": "endOfTurn" }
+      ],
+      "upgrade": {
+        "cost": 0,
+        "text": "Gain 2 energy. Take 5 damage at the end of your turn.",
+        "effects": [
+          { "type": "energy", "amount": 2 },
+          { "type": "delayedDamage", "amount": 5, "when": "endOfTurn" }
+        ]
+      }
+    },
+    {
+      "id": "hollow",
+      "name": "Hollow",
+      "school": "darkhold",
+      "rarity": "rare",
+      "cost": 2,
+      "text": "Exhaust. Lose 10 max HP. Add a random rare card to your hand.",
+      "effects": [
+        { "type": "loseMaxHealth", "amount": 10 },
+        { "type": "addRandomCard", "rarity": "rare", "to": "hand" }
+      ],
+      "exhaust": true,
+      "upgrade": {
+        "cost": 1,
+        "text": "Exhaust. Lose 10 max HP. Add a random rare card to your hand.",
+        "effects": [
+          { "type": "loseMaxHealth", "amount": 10 },
+          { "type": "addRandomCard", "rarity": "rare", "to": "hand" }
+        ]
+      }
+    },
+
+    {
+      "id": "thunderbolt",
+      "name": "Thunderbolt",
+      "school": "elemental",
+      "rarity": "common",
+      "cost": 2,
+      "text": "Deal 15 damage.",
+      "effects": [{ "type": "damage", "target": "enemy", "amount": 15 }],
+      "upgrade": { "text": "Deal 20 damage.", "effects": [{ "type": "damage", "target": "enemy", "amount": 20 }] }
+    },
+    {
+      "id": "mana_shield",
+      "name": "Mana Shield",
+      "school": "elemental",
+      "rarity": "common",
+      "cost": 2,
+      "text": "Gain 14 block.",
+      "effects": [{ "type": "block", "amount": 14 }],
+      "upgrade": { "text": "Gain 18 block.", "effects": [{ "type": "block", "amount": 18 }] }
+    },
+    {
+      "id": "lifebolt",
+      "name": "Lifebolt",
+      "school": "elemental",
+      "rarity": "common",
+      "cost": 1,
+      "text": "Heal 8.",
+      "effects": [{ "type": "heal", "amount": 8 }],
+      "upgrade": { "text": "Heal 12.", "effects": [{ "type": "heal", "amount": 12 }] }
+    },
+    {
+      "id": "frost_lance",
+      "name": "Frost Lance",
+      "school": "elemental",
+      "rarity": "common",
+      "cost": 1,
+      "text": "Deal 7 damage. The enemy loses 1 attack for the rest of the fight.",
+      "effects": [
+        { "type": "damage", "target": "enemy", "amount": 7 },
+        { "type": "debuffStat", "target": "enemy", "stat": "attack", "amount": 1, "permanent": true }
+      ],
+      "upgrade": {
+        "text": "Deal 9 damage. The enemy loses 2 attack for the rest of the fight.",
+        "effects": [
+          { "type": "damage", "target": "enemy", "amount": 9 },
+          { "type": "debuffStat", "target": "enemy", "stat": "attack", "amount": 2, "permanent": true }
+        ]
+      }
+    },
+    {
+      "id": "cinder_spray",
+      "name": "Cinder Spray",
+      "school": "elemental",
+      "rarity": "uncommon",
+      "cost": 1,
+      "text": "Deal 3 damage to ALL enemies. Apply Burn 3.",
+      "effects": [
+        { "type": "damage", "target": "allEnemies", "amount": 3 },
+        { "type": "status", "target": "allEnemies", "status": "burn", "amount": 3, "duration": 3 }
+      ],
+      "upgrade": {
+        "text": "Deal 4 damage to ALL enemies. Apply Burn 4.",
+        "effects": [
+          { "type": "damage", "target": "allEnemies", "amount": 4 },
+          { "type": "status", "target": "allEnemies", "status": "burn", "amount": 4, "duration": 3 }
+        ]
+      }
+    },
+    {
+      "id": "earthen_ward",
+      "name": "Earthen Ward",
+      "school": "elemental",
+      "rarity": "uncommon",
+      "cost": 1,
+      "text": "Gain 5 block. This block is not removed at the start of your next turn.",
+      "effects": [{ "type": "block", "amount": 5, "persists": true }],
+      "upgrade": { "text": "Gain 8 block. This block is not removed at the start of your next turn.", "effects": [{ "type": "block", "amount": 8, "persists": true }] }
+    },
+    {
+      "id": "stormcall",
+      "name": "Stormcall",
+      "school": "elemental",
+      "rarity": "rare",
+      "cost": 3,
+      "text": "Deal 7 damage to ALL enemies twice.",
+      "effects": [{ "type": "damage", "target": "allEnemies", "amount": 7, "times": 2 }],
+      "upgrade": { "text": "Deal 9 damage to ALL enemies twice.", "effects": [{ "type": "damage", "target": "allEnemies", "amount": 9, "times": 2 }] }
+    },
+    {
+      "id": "golden_light",
+      "name": "Golden Light",
+      "school": "elemental",
+      "rarity": "rare",
+      "cost": 1,
+      "text": "Pay 20 gold and X health. Deal X x 3 damage to one enemy.",
+      "requires": "gold:20",
+      "effects": [{ "type": "goldenLight", "goldCost": 20, "damagePerHealth": 3, "variableHealthCost": true }]
+    },
+
+    {
+      "_comment": "Cards below were added by Claude at the producer's request (more commons, rares and ancients). Ben: change or cut anything.",
+      "id": "bone_spur",
+      "name": "Bone Spur",
+      "school": "necromancy",
+      "rarity": "common",
+      "cost": 1,
+      "text": "Deal 3 damage twice.",
+      "effects": [{ "type": "damage", "target": "enemy", "amount": 3, "times": 2 }],
+      "upgrade": { "text": "Deal 4 damage twice.", "effects": [{ "type": "damage", "target": "enemy", "amount": 4, "times": 2 }] }
+    },
+    {
+      "id": "gnaw",
+      "name": "Gnaw",
+      "school": "darkhold",
+      "rarity": "common",
+      "cost": 1,
+      "text": "Deal 8 damage. Lose 2 HP.",
+      "effects": [{ "type": "damage", "target": "enemy", "amount": 8 }, { "type": "loseHealth", "amount": 2 }],
+      "upgrade": { "text": "Deal 11 damage. Lose 2 HP.", "effects": [{ "type": "damage", "target": "enemy", "amount": 11 }, { "type": "loseHealth", "amount": 2 }] }
+    },
+    {
+      "id": "cauterize",
+      "name": "Cauterize",
+      "school": "elemental",
+      "rarity": "common",
+      "cost": 1,
+      "text": "Gain 4 block. Apply Burn 3 to an enemy.",
+      "effects": [{ "type": "block", "amount": 4 }, { "type": "status", "target": "enemy", "status": "burn", "amount": 3, "duration": 3 }],
+      "upgrade": { "text": "Gain 6 block. Apply Burn 4 to an enemy.", "effects": [{ "type": "block", "amount": 6 }, { "type": "status", "target": "enemy", "status": "burn", "amount": 4, "duration": 3 }] }
+    },
+    {
+      "id": "ossuary",
+      "name": "Ossuary",
+      "school": "necromancy",
+      "rarity": "rare",
+      "cost": 2,
+      "text": "Summon 2 Skeletons.",
+      "effects": [{ "type": "summon", "id": "skeleton", "count": 2 }],
+      "upgrade": {
+        "text": "Summon 2 Skeletons. All your summons gain +2 attack.",
+        "effects": [{ "type": "summon", "id": "skeleton", "count": 2 }, { "type": "buffSummons", "stat": "attack", "amount": 2 }]
+      }
+    },
+    {
+      "id": "exsanguinate",
+      "name": "Exsanguinate",
+      "school": "darkhold",
+      "rarity": "rare",
+      "cost": 2,
+      "text": "Deal 6 damage to ALL enemies. Heal for half the damage dealt.",
+      "effects": [{ "type": "damage", "target": "allEnemies", "amount": 6, "lifesteal": 0.5 }],
+      "upgrade": { "text": "Deal 9 damage to ALL enemies. Heal for half the damage dealt.", "effects": [{ "type": "damage", "target": "allEnemies", "amount": 9, "lifesteal": 0.5 }] }
+    },
+    {
+      "id": "meteor",
+      "name": "Meteor",
+      "school": "elemental",
+      "rarity": "rare",
+      "cost": 3,
+      "text": "Deal 24 damage. Apply Burn 4.",
+      "effects": [{ "type": "damage", "target": "enemy", "amount": 24 }, { "type": "status", "target": "enemy", "status": "burn", "amount": 4, "duration": 3 }],
+      "upgrade": { "text": "Deal 30 damage. Apply Burn 5.", "effects": [{ "type": "damage", "target": "enemy", "amount": 30 }, { "type": "status", "target": "enemy", "status": "burn", "amount": 5, "duration": 3 }] }
+    },
+    {
+      "id": "first_grave",
+      "name": "The First Grave",
+      "school": "necromancy",
+      "rarity": "ancient",
+      "cost": 2,
+      "text": "Exhaust. Raise EVERY enemy that has died this fight, at full HP. They attack for half their original attack.",
+      "requires": "corpseAvailable",
+      "effects": [{ "type": "raiseAllCorpses" }],
+      "exhaust": true,
+      "upgrade": { "cost": 1 }
+    },
+    {
+      "id": "abyssal_pact",
+      "name": "Abyssal Pact",
+      "school": "darkhold",
+      "rarity": "ancient",
+      "cost": 0,
+      "text": "Exhaust. Gain 3 energy. Draw 3 cards. Lose 8 HP.",
+      "effects": [{ "type": "energy", "amount": 3 }, { "type": "draw", "amount": 3 }, { "type": "loseHealth", "amount": 8 }],
+      "exhaust": true,
+      "upgrade": {
+        "text": "Exhaust. Gain 3 energy. Draw 3 cards. Lose 5 HP.",
+        "effects": [{ "type": "energy", "amount": 3 }, { "type": "draw", "amount": 3 }, { "type": "loseHealth", "amount": 5 }]
+      }
+    },
+    {
+      "id": "cataclysm",
+      "name": "Cataclysm",
+      "school": "elemental",
+      "rarity": "ancient",
+      "cost": 3,
+      "text": "Deal 12 damage to ALL enemies. Apply Burn 5 to ALL enemies.",
+      "effects": [{ "type": "damage", "target": "allEnemies", "amount": 12 }, { "type": "status", "target": "allEnemies", "status": "burn", "amount": 5, "duration": 3 }],
+      "upgrade": {
+        "text": "Deal 16 damage to ALL enemies. Apply Burn 6 to ALL enemies.",
+        "effects": [{ "type": "damage", "target": "allEnemies", "amount": 16 }, { "type": "status", "target": "allEnemies", "status": "burn", "amount": 6, "duration": 3 }]
+      }
+    },
+
+    {
+      "_comment": "Second batch from Claude: better ways to block, and two big hits. Ben: change or cut anything.",
+      "id": "bone_plating",
+      "name": "Bone Plating",
+      "school": "necromancy",
+      "rarity": "common",
+      "cost": 1,
+      "text": "Gain 4 block, plus 3 for each summon you have.",
+      "effects": [{ "type": "block", "amount": 4 }, { "type": "blockPerSummon", "amount": 3 }],
+      "upgrade": { "text": "Gain 6 block, plus 3 for each summon you have.", "effects": [{ "type": "block", "amount": 6 }, { "type": "blockPerSummon", "amount": 3 }] }
+    },
+    {
+      "id": "stone_skin",
+      "name": "Stone Skin",
+      "school": "elemental",
+      "rarity": "common",
+      "cost": 1,
+      "text": "Gain 7 block.",
+      "effects": [{ "type": "block", "amount": 7 }],
+      "upgrade": { "text": "Gain 10 block.", "effects": [{ "type": "block", "amount": 10 }] }
+    },
+    {
+      "id": "grave_bulwark",
+      "name": "Grave Bulwark",
+      "school": "necromancy",
+      "rarity": "uncommon",
+      "cost": 2,
+      "text": "Summon a Bone Wall. Gain 10 block.",
+      "effects": [{ "type": "summon", "id": "bone_wall" }, { "type": "block", "amount": 10 }],
+      "upgrade": { "text": "Summon a Bone Wall. Gain 14 block.", "effects": [{ "type": "summon", "id": "bone_wall" }, { "type": "block", "amount": 14 }] }
+    },
+    {
+      "id": "blood_ward",
+      "name": "Blood Ward",
+      "school": "darkhold",
+      "rarity": "uncommon",
+      "cost": 1,
+      "text": "Lose 3 HP. Gain 14 block.",
+      "effects": [{ "type": "loseHealth", "amount": 3 }, { "type": "block", "amount": 14 }],
+      "upgrade": { "text": "Lose 3 HP. Gain 18 block.", "effects": [{ "type": "loseHealth", "amount": 3 }, { "type": "block", "amount": 18 }] }
+    },
+    {
+      "id": "bastion",
+      "name": "Bastion of Stone",
+      "school": "elemental",
+      "rarity": "rare",
+      "cost": 2,
+      "text": "Gain 24 block.",
+      "effects": [{ "type": "block", "amount": 24 }],
+      "upgrade": { "text": "Gain 30 block.", "effects": [{ "type": "block", "amount": 30 }] }
+    },
+    {
+      "id": "execution",
+      "name": "Execution",
+      "school": "darkhold",
+      "rarity": "rare",
+      "cost": 2,
+      "text": "Deal 30 damage. Lose 6 HP.",
+      "effects": [{ "type": "damage", "target": "enemy", "amount": 30 }, { "type": "loseHealth", "amount": 6 }],
+      "upgrade": { "text": "Deal 38 damage. Lose 6 HP.", "effects": [{ "type": "damage", "target": "enemy", "amount": 38 }, { "type": "loseHealth", "amount": 6 }] }
+    },
+    {
+      "id": "wrath_of_the_book",
+      "name": "Wrath of the Book",
+      "school": "neutral",
+      "rarity": "ancient",
+      "cost": 3,
+      "text": "Deal 45 damage.",
+      "effects": [{ "type": "damage", "target": "enemy", "amount": 45 }],
+      "upgrade": { "text": "Deal 55 damage.", "effects": [{ "type": "damage", "target": "enemy", "amount": 55 }] }
+    },
+    {
+      "id": "bone_throne",
+      "name": "The Bone Throne",
+      "school": "necromancy",
+      "rarity": "ancient",
+      "cost": 2,
+      "text": "Summon 2 Bone Walls. Gain 15 block that is not removed at the start of your next turn.",
+      "effects": [{ "type": "summon", "id": "bone_wall", "count": 2 }, { "type": "block", "amount": 15, "persists": true }],
+      "upgrade": {
+        "text": "Summon 2 Bone Walls. Gain 20 block that is not removed at the start of your next turn.",
+        "effects": [{ "type": "summon", "id": "bone_wall", "count": 2 }, { "type": "block", "amount": 20, "persists": true }]
+      }
+    }
+  ],
+
+  "curses": [
+    { "id": "doubt", "name": "Doubt", "cost": null, "text": "Unplayable. At the end of your turn, lose 2 HP.", "unplayable": true, "effects": [{ "type": "delayedDamage", "amount": 2, "when": "endOfTurn" }] },
+    { "id": "dead_weight", "name": "Dead Weight", "cost": null, "text": "Unplayable. Cannot be discarded.", "unplayable": true, "retain": true }
+  ]
+}

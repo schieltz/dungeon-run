@@ -1,0 +1,59 @@
+{
+  "_comment": "DUNGEON RUN companions. Max 2 at a time. They do not fight and cannot be killed. Each one reshapes the whole run. Sacrifice is always available, always permanent.",
+
+  "maxCompanions": 2,
+
+  "companions": [
+    {
+      "id": "grave_tender_mol",
+      "name": "Grave-Tender Mol",
+      "school": "necromancy",
+      "flavor": "She was burying the dungeon's dead long before you arrived. She has opinions about how it should be done.",
+      "passive": {
+        "text": "All your summons enter with +4 HP and +2 attack.",
+        "effect": { "type": "summonBonus", "hp": 4, "attack": 2 }
+      },
+      "sacrifice": {
+        "name": "Open the Graves",
+        "text": "Heal to full. Immediately raise every enemy that has died this fight.",
+        "effects": [
+          { "type": "healFull" },
+          { "type": "raiseAllCorpses" }
+        ]
+      }
+    },
+    {
+      "id": "ashlin_the_ember",
+      "name": "Ashlin the Ember",
+      "school": "elemental",
+      "flavor": "Chained next to a torch for so long she started to become one. Freeing her was arguably a mistake.",
+      "passive": {
+        "text": "Your Elemental cards deal +4 damage.",
+        "effect": { "type": "schoolDamageBonus", "school": "elemental", "amount": 4 }
+      },
+      "sacrifice": {
+        "name": "Burn Out",
+        "text": "Deal 60 damage to ALL enemies.",
+        "effects": [{ "type": "damage", "target": "allEnemies", "amount": 60 }]
+      }
+    },
+    {
+      "id": "the_pale_debtor",
+      "name": "The Pale Debtor",
+      "school": "darkhold",
+      "flavor": "He does not say what he is owed, or by whom. He only follows, and keeps count.",
+      "passive": {
+        "text": "Whenever you lose HP from your OWN cards, heal 3 and deal 3 damage to ALL enemies.",
+        "effect": { "type": "onSelfDamage", "heal": 3, "damageAllEnemies": 3 }
+      },
+      "sacrifice": {
+        "name": "Settle the Debt",
+        "text": "Remove all curses from your deck. Heal to full.",
+        "effects": [
+          { "type": "removeAllCurses" },
+          { "type": "healFull" }
+        ]
+      }
+    }
+  ]
+}

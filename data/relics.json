@@ -1,0 +1,89 @@
+{
+  "_comment": "DUNGEON RUN relics. Kept for the whole run. PLACEHOLDERS: Claude made these twelve so events and elites have relics to give. Ben: rename them, rewrite them, add more. Each relic can have 'onPickup' effects (once, when you get it) and 'atFightStart' effects (at the start of every fight, after you draw). Fight-start effects use the same keywords as cards.",
+  "relics": [
+    {
+      "id": "iron_buckle",
+      "name": "Iron Buckle",
+      "rarity": "common",
+      "text": "Start each fight with 6 block.",
+      "atFightStart": [{ "type": "block", "amount": 6 }]
+    },
+    {
+      "id": "grave_dirt",
+      "name": "Jar of Grave Dirt",
+      "rarity": "common",
+      "text": "Raise your max HP by 8.",
+      "onPickup": [{ "type": "gainMaxHealth", "amount": 8 }]
+    },
+    {
+      "id": "whetstone",
+      "name": "Bloodied Whetstone",
+      "rarity": "uncommon",
+      "text": "Start each fight with 1 Strength.",
+      "atFightStart": [{ "type": "buffSelf", "stat": "strength", "amount": 1 }]
+    },
+    {
+      "id": "ember_jar",
+      "name": "Ember in a Jar",
+      "rarity": "uncommon",
+      "text": "At the start of each fight, apply Burn 3 to ALL enemies.",
+      "atFightStart": [{ "type": "status", "target": "allEnemies", "status": "burn", "amount": 3, "duration": 3 }]
+    },
+    {
+      "id": "gravediggers_spade",
+      "name": "Gravedigger's Spade",
+      "rarity": "rare",
+      "text": "Start each fight with a Skeleton already summoned.",
+      "atFightStart": [{ "type": "summon", "id": "skeleton" }]
+    },
+    {
+      "id": "black_candle",
+      "name": "The Black Candle",
+      "rarity": "rare",
+      "text": "Start each fight with 2 extra energy and 1 extra card.",
+      "atFightStart": [{ "type": "energy", "amount": 2 }, { "type": "draw", "amount": 1 }]
+    },
+    {
+      "id": "tallow_stub",
+      "name": "Tallow Stub",
+      "rarity": "common",
+      "text": "Heal 4 at the start of each fight.",
+      "atFightStart": [{ "type": "heal", "amount": 4 }]
+    },
+    {
+      "id": "rusted_key",
+      "name": "Rusted Key",
+      "rarity": "common",
+      "text": "Gain 40 gold.",
+      "onPickup": [{ "type": "gainGold", "amount": 40 }]
+    },
+    {
+      "id": "bone_dice",
+      "name": "Bone Dice",
+      "rarity": "uncommon",
+      "text": "At the start of each fight, deal 5 damage to ALL enemies.",
+      "atFightStart": [{ "type": "damage", "target": "allEnemies", "amount": 5 }]
+    },
+    {
+      "id": "hunters_mark",
+      "name": "Hunter's Chalk",
+      "rarity": "uncommon",
+      "text": "At the start of each fight, apply Mark of Rot 1 to ALL enemies.",
+      "atFightStart": [{ "type": "status", "target": "allEnemies", "status": "marked", "duration": 1 }]
+    },
+    {
+      "id": "phylactery",
+      "name": "Cracked Phylactery",
+      "rarity": "rare",
+      "text": "Start each fight with 2 Strength.",
+      "atFightStart": [{ "type": "buffSelf", "stat": "strength", "amount": 2 }]
+    },
+    {
+      "id": "saints_finger",
+      "name": "A Saint's Finger Bone",
+      "rarity": "rare",
+      "text": "Start each fight with 2 Bone Walls already summoned.",
+      "atFightStart": [{ "type": "summon", "id": "bone_wall", "count": 2 }]
+    }
+  ]
+}

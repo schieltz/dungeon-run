@@ -1,0 +1,119 @@
+{
+  "_comment": "DUNGEON RUN global tuning. Ben: this file is the dial board. Every number here changes the feel of the whole game. Change one at a time and play a run.",
+
+  "player": {
+    "startingMaxHp": 70,
+    "startingGold": 50,
+    "energyPerTurn": 3,
+    "handSize": 5,
+    "startingHandDraw": 5
+  },
+
+  "run": {
+    "nodeCount": 13,
+    "secondBreaths": 3,
+    "maxSummons": 4,
+    "guaranteeRestBeforeBoss": true,
+    "guaranteeRestInBackHalf": true,
+  "_guaranteeEventComment": "true: the room every path passes through partway down (where the paths join) is always an event.",
+  "guaranteeEvent": true,
+    "targetRunMinutes": 15
+  },
+
+  "baseline": {
+    "_comment": "Design yardstick. 1 energy should buy about this much. Anything better must cost something.",
+    "damagePerEnergy": 6,
+    "blockPerEnergy": 5
+  },
+
+  "statusEffects": {
+    "weakMultiplier": 0.75,
+    "markedMultiplier": 1.5,
+    "frailMultiplier": 0.75,
+    "defaultDuration": 2
+  },
+
+  "callYourShot": {
+    "enabled": true,
+    "rewardEnergy": 1,
+    "maxBonusesPerTurn": 1,
+    "penaltyForWrong": 0
+  },
+
+  "goldenLight": {
+    "goldCost": 20,
+    "damagePerHealthPaid": 3
+  },
+
+  "reanimate": {
+    "hpMultiplier": 2,
+    "attackMultiplier": 0.5
+  },
+
+  "rewards": {
+    "goldPerCombat": [15, 25],
+    "goldPerElite": [75, 110],
+    "cardChoiceCount": 3,
+    "restHealPercent": 0.3,
+    "_rarityComment": "How often each rarity shows up in card rewards and the shop. Bigger number = more often.",
+    "rarityWeights": { "common": 60, "uncommon": 30, "rare": 10, "ancient": 2 },
+    "_eliteComment": "Elites are the risk. These are the reward: better odds on the cards they offer, and a relic every time.",
+    "eliteRarityWeights": { "common": 15, "uncommon": 45, "rare": 30, "ancient": 10 },
+    "eliteRelicRarityWeights": { "common": 50, "uncommon": 35, "rare": 15 },
+    "_companionComment": "Chance (0 to 1) that beating an elite frees a companion you can take with you.",
+    "eliteCompanionChance": 0.5
+  },
+
+  "shop": {
+    "cardPrice": [40, 75],
+    "relicPrice": [100, 160],
+    "cardRemovalPrice": 60,
+    "cardsForSale": 5
+  },
+
+  "map": {
+    "_comment": "The shape of the dungeon. Paths split into lanes for braidLength nodes, then join again at one node, then split again. The node before the boss is a choice of Rest or Shop.",
+    "braidLength": 3,
+    "lanes": [3, 4],
+    "_laneThemesComment": "Each lane in a split gets its own character, so picking a lane means something. Weights: bigger number = more often. atLeastOne: the lane always has at least one of that kind of room (when one can go there).",
+    "laneThemes": {
+      "fights": { "weights": { "combat": 7, "elite": 1, "event": 1, "shop": 1, "rest": 1 } },
+      "elites": { "weights": { "combat": 3, "elite": 4, "event": 1, "rest": 1 }, "atLeastOne": "elite" },
+      "events": { "weights": { "combat": 3, "elite": 1, "event": 4, "shop": 1, "rest": 1 }, "atLeastOne": "event" },
+      "mixed": { "weights": { "combat": 4, "elite": 2, "event": 2, "shop": 1, "rest": 1 } }
+    },
+    "_extraLaneComment": "When a split has more lanes than themes that fit there, the extra lanes get this theme.",
+    "extraLaneTheme": "fights",
+    "_joinComment": "The single rooms where the lanes meet. The first one is always an event when run.guaranteeEvent is true.",
+    "joinTypeWeights": { "combat": 3, "event": 1, "shop": 1, "rest": 1 },
+    "firstShopNode": 3,
+    "firstRestNode": 4,
+    "firstEliteNode": 5,
+    "encounterTiers": [
+      { "fromNode": 1, "tier": "easy" },
+      { "fromNode": 4, "tier": "medium" },
+      { "fromNode": 9, "tier": "hard" }
+    ]
+  },
+
+  "depthTiers": [
+    { "depth": 0, "name": "The Steps", "modifiers": [] },
+    { "depth": 1, "name": "Wet Stone", "modifiers": [{ "type": "enemyHp", "multiplier": 1.15 }] },
+    { "depth": 2, "name": "The Long Corridor", "modifiers": [{ "type": "startWithCurse", "id": "doubt" }] },
+    { "depth": 3, "name": "Torchless", "modifiers": [{ "type": "removeRestNodes", "count": 1 }] },
+    { "depth": 4, "name": "The Iron Rooms", "modifiers": [{ "type": "eliteDamage", "multiplier": 1.25 }] },
+    { "depth": 5, "name": "Pure Evil", "modifiers": [{ "type": "secondBreaths", "value": 1 }] }
+  ],
+
+  "palette": {
+    "_comment": "Wet stone, torchlight, dirt. Dark base, warm accents.",
+    "background": "#0d0b0a",
+    "stone": "#2a2521",
+    "torch": "#e8a33d",
+    "necromancy": "#7fb069",
+    "darkhold": "#8b5cf6",
+    "elemental": "#f5d76e",
+    "danger": "#c1292e",
+    "text": "#e8e2d9"
+  }
+}

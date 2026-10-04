@@ -1,0 +1,144 @@
+{
+  "_comment": "DUNGEON RUN events. Design rule: BOTH options must cost something. An event where one choice is strictly better is not an event, it is a free reward. Skill-based minigames are high risk, high reward - they can make or break a run, which is the point.",
+
+  "designRules": [
+    "Every event choice has a real downside.",
+    "The player can always walk away, but walking away is itself a cost (time, gold, or a missed relic).",
+    "Minigames must be winnable with skill, not luck alone. The player should feel they lost because they played badly.",
+    "Minigames must be fast. 60 seconds maximum. If it drags, it is cut."
+  ],
+
+  "_runBuffsComment": "Lasting effects an event can grant (grantRunBuff). 'fights' is how many fights it lasts; 'atFightStart' uses the same keywords as cards.",
+  "runBuffs": {
+    "free_skeleton_3_fights": {
+      "name": "Grave Company",
+      "text": "Your next 3 fights start with a free Skeleton already summoned.",
+      "fights": 3,
+      "atFightStart": [{ "type": "summon", "id": "skeleton" }]
+    }
+  },
+
+  "events": [
+    {
+      "id": "chained_prisoner",
+      "name": "The Chained Prisoner",
+      "flavor": "He has been here longer than the chains. He begs. The begging is not quite in a language you know.",
+      "choices": [
+        {
+          "label": "Free him",
+          "text": "He joins you as a companion. But the chains were holding something IN him.",
+          "effects": [
+            { "type": "gainRandomCompanion" },
+            { "type": "addCurse", "id": "doubt", "count": 1 }
+          ]
+        },
+        {
+          "label": "Take his gold and leave",
+          "text": "He had a great deal of it. He will not need it.",
+          "effects": [
+            { "type": "gainGold", "amount": 90 },
+            { "type": "loseMaxHealth", "amount": 5 }
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "the_dealers_table",
+      "name": "The Dealer's Table",
+      "type": "minigame",
+      "minigame": "memory_match",
+      "flavor": "A dead man sits at a table with cards laid face down. His hand still moves. He wants to play.",
+      "rules": {
+        "description": "12 cards face down, 6 pairs. Flip two at a time to find matches. You get a limited number of flips.",
+        "gridSize": 12,
+        "pairs": 6,
+        "flipsAllowed": 16,
+        "_tuning": "16 flips is beatable with real attention and unwinnable by guessing. Lower it to make the game harder."
+      },
+      "entry": {
+        "label": "Sit down and play",
+        "cost": { "type": "payHealth", "amount": 8 },
+        "text": "Costs 8 HP to sit. The dead do not play for free."
+      },
+      "outcomes": [
+        { "condition": "allPairsFound", "text": "He nods and pushes something across the table.", "effects": [{ "type": "gainRelic", "rarity": "rare" }, { "type": "gainGold", "amount": 60 }] },
+        { "condition": "pairsFound>=4", "text": "Close enough. He gives you part of the pot.", "effects": [{ "type": "gainGold", "amount": 60 }] },
+        { "condition": "pairsFound<4", "text": "He takes the rest of what you bet.", "effects": [{ "type": "loseGold", "amount": 40 }] }
+      ],
+      "walkAway": { "label": "Do not sit down", "text": "Nothing gained. Nothing lost. He watches you go.", "effects": [] }
+    },
+
+    {
+      "id": "the_blood_wager",
+      "name": "The Blood Wager",
+      "type": "minigame",
+      "minigame": "push_your_luck",
+      "flavor": "A basin, a blade, and three relics on a shelf behind it. The basin does not care whose blood it is.",
+      "rules": {
+        "description": "Each round, pay HP to draw. Draw good and the prize improves. Draw the Rot and you lose everything you have staked. Stop at any time and keep what you have won.",
+        "rounds": 5,
+        "costPerRound": [5, 7, 9, 12, 15],
+        "rotChancePerRound": [0.1, 0.2, 0.3, 0.45, 0.6],
+        "prizes": [
+          { "label": "30 gold", "effects": [{ "type": "gainGold", "amount": 30 }] },
+          { "label": "70 gold", "effects": [{ "type": "gainGold", "amount": 70 }] },
+          { "label": "a common relic", "effects": [{ "type": "gainRelic", "rarity": "common" }] },
+          { "label": "an uncommon relic", "effects": [{ "type": "gainRelic", "rarity": "uncommon" }] },
+          { "label": "a rare relic", "effects": [{ "type": "gainRelic", "rarity": "rare" }] }
+        ],
+        "_tuning": "The expected value turns negative at round 4. A player who does the math stops at 3. A player who wants the rare relic gambles anyway. That tension IS the event."
+      },
+      "entry": { "label": "Cut your hand", "text": "Begin the wager.", "effects": [] },
+      "walkAway": { "label": "Leave the basin alone", "text": "The relics stay on the shelf.", "effects": [] }
+    },
+
+    {
+      "id": "the_forbidden_page",
+      "name": "A Loose Page",
+      "flavor": "A single page from your book, torn out long before you owned it, pinned to the wall with a nail.",
+      "choices": [
+        {
+          "label": "Read it",
+          "text": "Add a random RARE card to your deck. Reading it costs you something you do not get back.",
+          "effects": [
+            { "type": "addRandomCard", "rarity": "rare", "to": "deck" },
+            { "type": "loseMaxHealth", "amount": 8 }
+          ]
+        },
+        {
+          "label": "Burn it",
+          "text": "Remove any one card from your deck permanently. Heal 15.",
+          "effects": [
+            { "type": "removeCardChoice", "count": 1 },
+            { "type": "heal", "amount": 15 }
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "the_mass_grave",
+      "name": "The Mass Grave",
+      "flavor": "The dungeon has been running a long time. This is where the arithmetic of it ends up.",
+      "choices": [
+        {
+          "label": "Raise them",
+          "text": "Start your next 3 fights with a free Skeleton already summoned. The dungeon notices what you did.",
+          "effects": [
+            { "type": "grantRunBuff", "id": "free_skeleton_3_fights" },
+            { "type": "enemyBuffNextFights", "stat": "strength", "amount": 2, "fights": 3 }
+          ]
+        },
+        {
+          "label": "Bury them properly",
+          "text": "Heal to full. It takes hours you do not have - skip the next reward.",
+          "effects": [
+            { "type": "healFull" },
+            { "type": "skipNextReward" }
+          ]
+        }
+      ]
+    }
+  ]
+}

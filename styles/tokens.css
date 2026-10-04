@@ -1,0 +1,558 @@
+/* DUNGEON RUN design tokens (DESIGN.md section 8).
+   Every color, shadow, type size, spacing step and timing value lives here. main.css uses only these.
+   Later phases add to this file instead of inventing values in component CSS.
+
+   Palette source of truth is data/config.json "palette", injected at boot as --pal-<name>.
+   Everything below derives from those. The plain named-color fallbacks only ever show if
+   config.json itself fails to load, so the error screen is still readable. */
+
+:root {
+  /* ---------- Palette (from config.json) ---------- */
+  --color-void: var(--pal-background, black);
+  --color-stone: var(--pal-stone, dimgray);
+  --color-torch: var(--pal-torch, orange);
+  --color-blood: var(--pal-danger, red);
+  --color-bone: var(--pal-text, white);
+  --color-necromancy: var(--pal-necromancy, green);
+  --color-darkhold: var(--pal-darkhold, purple);
+  --color-elemental: var(--pal-elemental, gold);
+
+  /* ---------- Darkness and stone ---------- */
+  --color-pitch: color-mix(in srgb, var(--color-void) 60%, black);
+  --color-stone-deep: color-mix(in srgb, var(--color-stone) 42%, var(--color-void));
+  --color-stone-mid: color-mix(in srgb, var(--color-stone) 72%, var(--color-void));
+  --color-stone-warm: color-mix(in srgb, var(--color-stone) 86%, var(--color-torch));
+  --color-iron: color-mix(in srgb, var(--color-stone) 82%, var(--color-bone));
+  --color-iron-dark: color-mix(in srgb, var(--color-iron) 45%, var(--color-void));
+  --color-mortar: color-mix(in srgb, var(--color-pitch) 70%, transparent);
+  --color-dirt: color-mix(in srgb, var(--color-stone) 92%, var(--color-torch));
+
+  /* ---------- Fire ---------- */
+  --color-flame: color-mix(in srgb, var(--color-torch) 55%, var(--color-elemental));
+  --color-ember: color-mix(in srgb, var(--color-torch) 62%, var(--color-blood));
+  --color-torch-dim: color-mix(in srgb, var(--color-torch) 55%, var(--color-void));
+  --color-torch-glow: color-mix(in srgb, var(--color-torch) 42%, transparent);
+  --color-torch-haze: color-mix(in srgb, var(--color-torch) 14%, transparent);
+  --color-blood-glow: color-mix(in srgb, var(--color-blood) 45%, transparent);
+  --color-blood-deep: color-mix(in srgb, var(--color-blood) 30%, var(--color-void));
+  --color-blood-bright: color-mix(in srgb, var(--color-blood) 78%, var(--color-bone));
+  --color-hp-loss: color-mix(in srgb, var(--color-ember) 65%, var(--color-bone));
+
+  /* ---------- Text on stone ---------- */
+  --color-text: var(--color-bone);
+  --color-text-dim: color-mix(in srgb, var(--color-bone) 64%, var(--color-void));
+  --color-text-faint: color-mix(in srgb, var(--color-bone) 42%, var(--color-void));
+  --color-text-on-fire: var(--color-pitch);
+  --color-log-player: color-mix(in srgb, var(--color-torch) 70%, var(--color-text-dim));
+  --color-log-enemy: color-mix(in srgb, var(--color-blood) 70%, var(--color-text-dim));
+  --color-log-summon: color-mix(in srgb, var(--color-necromancy) 75%, var(--color-text-dim));
+
+  /* ---------- Vellum (card stock) and ink ---------- */
+  --color-vellum: color-mix(in srgb, color-mix(in srgb, var(--color-bone) 72%, var(--color-torch)) 86%, var(--color-stone));
+  --color-vellum-burnt: color-mix(in srgb, var(--color-vellum) 45%, var(--color-ember));
+  --color-ink: color-mix(in srgb, var(--color-void) 86%, var(--color-stone));
+  --color-ink-faded: color-mix(in srgb, var(--color-ink) 58%, var(--color-vellum));
+  --color-ink-rule: color-mix(in srgb, var(--color-ink) 30%, transparent);
+  --color-ink-warning: color-mix(in srgb, var(--color-blood) 70%, var(--color-ink));
+  --color-ash: color-mix(in srgb, var(--color-bone) 36%, var(--color-stone));
+  --color-scrim: color-mix(in srgb, var(--color-pitch) 78%, transparent);
+
+  /* ---------- Creatures ---------- */
+  --color-robe: color-mix(in srgb, color-mix(in srgb, var(--color-stone) 78%, var(--color-darkhold)) 70%, var(--color-bone));
+  --color-vermin: color-mix(in srgb, color-mix(in srgb, var(--color-stone) 74%, var(--color-torch)) 76%, var(--color-bone));
+  --color-risen: color-mix(in srgb, var(--color-necromancy) 42%, var(--color-vermin));
+  --color-bat: color-mix(in srgb, color-mix(in srgb, var(--color-stone) 70%, var(--color-darkhold)) 80%, var(--color-bone));
+  --color-bones: color-mix(in srgb, var(--color-bone) 72%, var(--color-stone));
+  --color-goblin: color-mix(in srgb, color-mix(in srgb, var(--color-necromancy) 45%, var(--color-stone)) 85%, var(--color-bone));
+  --color-wraith: color-mix(in srgb, var(--color-ash) 80%, var(--color-bone));
+  --color-flesh: color-mix(in srgb, color-mix(in srgb, var(--color-bone) 70%, var(--color-blood)) 75%, var(--color-stone));
+  --color-hide: color-mix(in srgb, color-mix(in srgb, var(--color-stone) 82%, var(--color-blood)) 85%, var(--color-bone));
+  --color-inquisitor: color-mix(in srgb, color-mix(in srgb, var(--color-stone) 70%, var(--color-darkhold)) 88%, var(--color-bone));
+  --color-shell: color-mix(in srgb, color-mix(in srgb, var(--color-blood) 50%, var(--color-torch)) 72%, var(--color-stone));
+  --color-necro-glow: color-mix(in srgb, var(--color-necromancy) 45%, transparent);
+  --color-spider: color-mix(in srgb, color-mix(in srgb, var(--color-stone) 60%, var(--color-darkhold)) 72%, var(--color-bone));
+  --color-ghoul: color-mix(in srgb, color-mix(in srgb, var(--color-bone) 62%, var(--color-necromancy)) 72%, var(--color-stone));
+  --color-acolyte: color-mix(in srgb, color-mix(in srgb, var(--color-blood) 45%, var(--color-stone)) 85%, var(--color-bone));
+  --color-hound: color-mix(in srgb, color-mix(in srgb, var(--color-stone) 70%, var(--color-torch)) 72%, var(--color-bone));
+  --color-stolen: color-mix(in srgb, var(--color-darkhold) 60%, var(--color-bone));
+  --filter-stolen: drop-shadow(0 0 8px var(--color-shard-glow));
+
+  /* ---------- Schools (DESIGN.md section 4). A card picks --school-<its school>. ---------- */
+  --school-necromancy: var(--color-necromancy);
+  --school-darkhold: var(--color-darkhold);
+  --school-elemental: var(--color-elemental);
+  --school-neutral: color-mix(in srgb, var(--color-bone) 82%, var(--color-torch));
+  --school-curse: var(--color-ash);
+
+  /* ---------- Gilt: the edge of a rare card (DESIGN.md section 4) ---------- */
+  --color-gilt: color-mix(in srgb, var(--color-elemental) 62%, var(--color-torch));
+  --color-gilt-deep: color-mix(in srgb, var(--color-gilt) 52%, var(--color-ink));
+  --color-gilt-glow: color-mix(in srgb, var(--color-gilt) 45%, transparent);
+  --color-ember-glow: color-mix(in srgb, var(--color-ember) 50%, transparent);
+
+  /* ---------- Type (DESIGN.md section 2) ---------- */
+  --font-display: "Grenze Gotisch", "Iowan Old Style", Georgia, serif;
+  --font-text: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", Verdana, sans-serif;
+
+  --type-2xs: 11px;
+  --type-xs: 13px;
+  --type-sm: 15px;
+  --type-md: 16px;
+  --type-lg: 19px;
+  --type-xl: 23px;
+  --type-2xl: 28px;
+  --type-3xl: 34px;
+  --type-4xl: 48px;
+  --type-5xl: 64px;
+
+  --weight-text: 400;
+  --weight-bold: 700;
+  --weight-heavy: 800;
+  --weight-display: 600;
+  --weight-display-heavy: 800;
+
+  --leading-tight: 1;
+  --leading-snug: 1.15;
+  --leading-text: 1.3;
+  --tracking-caps: 0.14em;
+  --tracking-display: 0.04em;
+  --tracking-title: 0.08em;
+
+  /* ---------- Space (dense: DESIGN.md section 7) ---------- */
+  --space-1: 2px;
+  --space-2: 4px;
+  --space-3: 6px;
+  --space-4: 8px;
+  --space-5: 12px;
+  --space-6: 16px;
+  --space-7: 22px;
+  --space-8: 30px;
+  --gap-region: var(--space-2);
+
+  /* ---------- Worn edges: no uniform radius ---------- */
+  --radius-worn-1: 3px 8px 4px 10px / 8px 3px 9px 4px;
+  --radius-worn-2: 7px 3px 9px 4px / 3px 9px 4px 8px;
+  --radius-worn-3: 4px 10px 3px 7px / 9px 4px 8px 3px;
+  --radius-chip: 2px 4px 3px 5px;
+  --radius-wax: 47% 53% 50% 46% / 52% 46% 54% 48%;
+  --radius-round: 50%;
+  --chipped-corners: polygon(0 7px, 7px 0, calc(100% - 11px) 0, 100% 9px, 100% calc(100% - 6px), calc(100% - 7px) 100%, 9px 100%, 0 calc(100% - 10px));
+
+  /* ---------- Sizes ---------- */
+  --tap: 44px;
+  --measure: 40em;
+  --hairline: 1px;
+  --rule: 2px;
+  --icon-sm: 18px;
+  --icon-md: 24px;
+  --orb-size: 44px;
+  --badge-size: 34px;
+  --seal-size: 42px;
+  --seal-offset: -12px;
+  --seal-clearance: 20px;
+  --sigil-size: 30px;
+  --sigil-offset: -13px;
+  --card-w: 186px;
+  --card-min-w: 112px;
+  --card-min-h: 184px;
+  --card-border: 2px;
+  --card-band: 3px;
+  --card-lift: -14px;
+  --card-band-gap: 2px;
+  --card-band-inner: 2px;
+  --ornament-inset: 12px;
+  --ornament-inset-ancient: 16px;
+  --ornament-len: 18px;
+  --ornament-thick: 3px;
+  --call-tag-offset: -10px;
+  --medallion-size: 30px;
+  --companion-w: 340px;
+  --companion-max-w: 460px;
+  --readout-w: 64px;
+  --memory-card-w: clamp(64px, 16vw, 130px);
+  --memory-glyph: 58%;
+  --memory-cols: 6;
+  --memory-cols-narrow: 4;
+  --event-choice-w: 300px;
+  --relic-w: 260px;
+  --ladder-w: 560px;
+  --hand-headroom: 26px;
+  --hand-footroom: 18px;
+  --hpbar-h: 22px;
+  --hpbar-min-w: 112px;
+  --unit-min-w: 140px;
+  --summon-min-w: 140px;
+  --intent-max-w: 200px;
+  --slot-gutter: 22px;
+  --unit-chrome: 130px;
+  --unit-chrome-crowded: 150px;
+  --chip-row-h: 24px;
+  --span-boss: 2.4;
+  --span-boss-extra: 1.4; /* --span-boss less the one slot every creature has */
+  --tag-row-h: 42px;
+  --card-row-w: 160px;
+  --choice-w: 220px;
+  --choice-h: 170px;
+  --icon-xl: 44px;
+  --sheet-max-w: 980px;
+  --slab-w: 560px;
+  --map-pad: 34px;
+  --stamp-size: 52px;
+  --stamp-size-boss: 68px;
+  --map-line: 3px;
+  --map-line-strong: 4px;
+  --map-dash: 2 9;
+  --opacity-faded: 0.38;
+  --opacity-ahead: 0.82;
+  --amount-w: 1.6em;
+  --pile-w: 64px;
+  --button-min-w: 150px;
+  --button-h: 58px;
+  --field-h-portrait: clamp(240px, 37dvh, 520px);
+  --field-pad-x: clamp(8px, 4vw, 30px);
+  --log-w: clamp(230px, 27vw, 340px);
+  --log-min-h: 96px;
+  --torch-w: clamp(22px, 3.2vw, 34px);
+  --torch-h: clamp(50px, 8dvh, 80px);
+  --torch-top: 6%;
+  --torch-inset: 15%;
+  --torch-glow-size: clamp(240px, 46vw, 600px);
+  --torch-glow-center: 22%;
+  --torch-flame-base: 40%;
+
+  /* Sprites: scale communicates threat (DESIGN.md section 5). Aspect ratios match each viewBox in index.html.
+     A crowded board shrinks everyone to fit (--slot-w in main.css). */
+  --sprite-h-player: clamp(110px, 19dvh, 230px);
+  --sprite-h-vermin: clamp(56px, 10dvh, 112px);
+  --sprite-h-small: clamp(68px, 12dvh, 136px);
+  --sprite-h-medium: clamp(88px, 15dvh, 170px);
+  --sprite-h-large: clamp(108px, 18dvh, 205px);
+  --sprite-h-elite: clamp(140px, 26dvh, 290px);
+  --sprite-h-boss: clamp(160px, 32dvh, 360px);
+  --sprite-h-default: var(--sprite-h-medium);
+  --aspect-player: 100 / 140;
+  --aspect-rat: 140 / 92;
+  --aspect-bat: 160 / 80;
+  --aspect-mote: 60 / 48;
+  --aspect-barnacle: 80 / 60;
+  --aspect-wretch: 100 / 100;
+  --aspect-skeleton: 100 / 150;
+  --aspect-bone-wall: 130 / 90;
+  --aspect-wraith: 100 / 150;
+  --aspect-blob: 130 / 92;
+  --aspect-shaman: 100 / 124;
+  --aspect-shieldbearer: 110 / 124;
+  --aspect-brute: 150 / 150;
+  --aspect-leech: 110 / 150;
+  --aspect-torturer: 140 / 170;
+  --aspect-questioner: 110 / 180;
+  --aspect-crab: 240 / 140;
+  --aspect-spider: 120 / 80;
+  --aspect-ghoul: 100 / 130;
+  --aspect-acolyte: 100 / 150;
+  --aspect-kennel: 150 / 170;
+  --aspect-hound: 120 / 80;
+  --aspect-default: 1;
+
+  /* ---------- Light (DESIGN.md section 1): falloff stops, placed by components ---------- */
+  --falloff-flame: color-mix(in srgb, var(--color-torch) 28%, transparent) 0, color-mix(in srgb, var(--color-torch) 11%, transparent) 30%, color-mix(in srgb, var(--color-torch) 4%, transparent) 60%, transparent 100%;
+  --falloff-pool: color-mix(in srgb, var(--color-torch) 16%, transparent) 0, transparent 70%;
+  --falloff-held: color-mix(in srgb, var(--color-torch) 22%, transparent) 0, color-mix(in srgb, var(--color-torch) 6%, transparent) 45%, transparent 75%;
+  --falloff-lit-surface: color-mix(in srgb, var(--color-bone) 22%, transparent) 0, transparent 70%;
+  --falloff-vignette: transparent 35%, color-mix(in srgb, var(--color-pitch) 70%, transparent) 75%, var(--color-pitch) 100%;
+  --falloff-risen: color-mix(in srgb, var(--color-necromancy) 20%, transparent) 0, color-mix(in srgb, var(--color-necromancy) 6%, transparent) 45%, transparent 75%;
+  --falloff-shard: color-mix(in srgb, var(--color-darkhold) 22%, transparent) 0, color-mix(in srgb, var(--color-darkhold) 7%, transparent) 50%, transparent 80%;
+  --falloff-burn: transparent 64%, color-mix(in srgb, var(--color-vellum-burnt) 38%, transparent) 90%, color-mix(in srgb, var(--color-vellum-burnt) 80%, transparent) 104%;
+
+  /* ---------- Texture (DESIGN.md section 3) ---------- */
+  --texture-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.62 -0.22'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  --texture-grain-size: 180px;
+  --texture-fibers: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='f' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9 0.22' numOctaves='2' stitchTiles='stitch' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0.22 0 0 0 0 0.14 0 0 0 0 0.06 0 0 0 0.5 -0.2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23f)'/%3E%3C/svg%3E");
+  --texture-fibers-size: 160px;
+  --texture-mottle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420'%3E%3Cfilter id='m' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012' numOctaves='4' stitchTiles='stitch' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.6 -0.62'/%3E%3C/filter%3E%3Crect width='420' height='420' filter='url(%23m)'/%3E%3C/svg%3E");
+  --texture-mottle-size: 420px;
+  --texture-masonry: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='76'%3E%3Cg fill='none' stroke='black' stroke-opacity='0.6' stroke-width='3'%3E%3Cpath d='M0 1.5H128M0 39.5H128M1.5 0V38M65.5 38V76'/%3E%3C/g%3E%3Cg fill='none' stroke='white' stroke-opacity='0.07'%3E%3Cpath d='M3 4.5H128M0 42.5H64M67 42.5H128'/%3E%3C/g%3E%3C/svg%3E");
+  --texture-masonry-size: 128px 76px;
+  --floor-line: 72%;
+
+  /* ---------- Built surfaces ---------- */
+  --surface-wax: radial-gradient(circle at 35% 30%, var(--color-flame), var(--color-torch) 55%, var(--color-ember));
+  --surface-fire:
+    radial-gradient(ellipse 90% 80% at 50% 0%, var(--falloff-lit-surface)),
+    linear-gradient(to bottom, var(--color-flame), var(--color-torch) 55%, var(--color-ember));
+  --surface-blood: linear-gradient(to bottom, var(--color-blood-bright), var(--color-blood) 60%, var(--color-blood-deep));
+
+  /* ---------- Depth (DESIGN.md section 3): recessed board, raised cards, modal above all ---------- */
+  --shadow-recess:
+    inset 0 3px 0 var(--color-pitch),
+    inset 0 14px 26px -8px var(--color-pitch),
+    inset 0 -1px 0 color-mix(in srgb, var(--color-bone) 7%, transparent),
+    inset 0 0 0 var(--hairline) color-mix(in srgb, var(--color-pitch) 80%, transparent);
+  --shadow-niche:
+    inset 0 2px 0 var(--color-pitch),
+    inset 0 18px 30px -10px var(--color-pitch),
+    inset 6px 0 18px -10px var(--color-pitch);
+  --shadow-ledge:
+    inset 0 var(--hairline) 0 color-mix(in srgb, var(--color-bone) 10%, transparent),
+    0 3px 0 var(--color-pitch),
+    0 10px 18px -6px var(--color-pitch);
+  --shadow-card:
+    0 2px 0 var(--color-ink),
+    0 12px 20px -6px var(--color-pitch),
+    0 3px 8px color-mix(in srgb, var(--color-pitch) 60%, transparent);
+  --shadow-card-lifted:
+    0 18px 30px -6px var(--color-pitch),
+    0 0 26px var(--color-torch-glow),
+    0 0 0 var(--rule) var(--color-torch);
+  --shadow-modal:
+    0 0 0 var(--hairline) var(--color-pitch),
+    0 30px 60px -10px var(--color-pitch),
+    0 0 140px color-mix(in srgb, var(--color-pitch) 80%, transparent);
+  --shadow-seal:
+    inset 0 2px 1px color-mix(in srgb, var(--color-bone) 40%, transparent),
+    inset 0 -3px 4px color-mix(in srgb, var(--color-ember) 70%, var(--color-pitch)),
+    0 3px 5px color-mix(in srgb, var(--color-pitch) 80%, transparent);
+  --shadow-button:
+    inset 0 2px 0 color-mix(in srgb, var(--color-bone) 45%, transparent),
+    inset 0 -4px 0 color-mix(in srgb, var(--color-ember) 60%, var(--color-pitch)),
+    0 4px 0 var(--color-pitch),
+    0 0 26px var(--color-torch-glow);
+  --shadow-button-pressed:
+    inset 0 2px 4px color-mix(in srgb, var(--color-pitch) 60%, transparent),
+    0 1px 0 var(--color-pitch);
+  --shadow-pile:
+    2px -2px 0 -1px var(--color-stone-mid),
+    4px -4px 0 -2px var(--color-stone-deep),
+    0 4px 8px var(--color-pitch);
+  --shadow-hpbar:
+    inset 0 2px 4px var(--color-pitch),
+    0 0 0 var(--hairline) var(--color-iron-dark),
+    0 0 0 var(--rule) var(--color-pitch);
+  --shadow-carved-divider: inset var(--hairline) 0 0 color-mix(in srgb, var(--color-bone) 6%, transparent);
+  --shadow-scratch: inset 0 var(--hairline) 0 color-mix(in srgb, var(--color-bone) 4%, transparent);
+  --shadow-text-carved: 0 -1px 0 var(--color-pitch), 0 1px 0 color-mix(in srgb, var(--color-bone) 14%, transparent);
+  --shadow-text-lit: 0 0 14px var(--color-torch-glow), 0 1px 0 var(--color-pitch);
+  --shadow-text-blood: 0 0 14px var(--color-blood-glow), 0 1px 0 var(--color-pitch);
+  --glow-torch: 0 0 18px var(--color-torch-glow), 0 0 44px var(--color-torch-haze);
+  --glow-target: 0 0 0 var(--rule) var(--color-torch), 0 0 28px var(--color-torch-glow);
+  --glow-intent: 0 0 18px var(--color-blood-glow);
+  --glow-guard: 0 0 14px color-mix(in srgb, var(--color-iron) 35%, transparent);
+  --glow-scheme: 0 0 16px color-mix(in srgb, var(--color-darkhold) 40%, transparent);
+  --shadow-text-scheme: 0 0 12px color-mix(in srgb, var(--color-darkhold) 60%, transparent), 0 1px 0 var(--color-pitch);
+  --shadow-stamp: 0 0 0 var(--rule) var(--color-ink-faded), 0 2px 4px color-mix(in srgb, var(--color-ink) 35%, transparent);
+  --shadow-stamp-open: 0 0 0 var(--rule) var(--color-ember), 0 0 0 calc(var(--rule) * 3) var(--color-torch-glow), 0 0 22px var(--color-torch-glow);
+  --shadow-stamp-here: 0 0 0 var(--rule) var(--color-ink), 0 0 0 calc(var(--rule) * 3) var(--color-torch), 0 0 26px var(--color-torch-glow);
+  --shadow-text-vellum: 0 0 3px var(--color-vellum), 0 0 6px var(--color-vellum);
+  --glow-summon-selected: 0 0 0 var(--rule) var(--color-necromancy), 0 0 28px var(--color-necro-glow);
+  --shadow-number: 0 0 2px var(--color-pitch), 0 0 2px var(--color-pitch), 0 3px 0 var(--color-pitch), 0 0 14px var(--color-blood-glow);
+  --shadow-number-blocked: 0 0 3px var(--color-pitch), 0 2px 0 var(--color-pitch);
+  --shadow-key-lit: inset 0 0 0 var(--rule) var(--color-ember), 0 0 18px var(--color-torch-glow);
+  --color-shard-glow: color-mix(in srgb, var(--color-darkhold) 55%, transparent);
+  --glow-beam: 0 0 22px var(--color-shard-glow), 0 0 0 var(--hairline) var(--color-darkhold);
+  --shadow-text-beam: 0 0 12px var(--color-shard-glow), 0 1px 0 var(--color-pitch);
+
+  /* ---------- Filters ---------- */
+  --filter-unlit: grayscale(0.85) brightness(0.55) contrast(0.95);
+  --filter-lit: brightness(1.08);
+  --filter-raised: drop-shadow(0 2px 0 var(--color-pitch));
+  --filter-risen: drop-shadow(0 0 8px var(--color-necro-glow));
+  --mirror: scaleX(-1);
+  --filter-glow-blood: drop-shadow(0 0 6px var(--color-blood-glow));
+  --filter-hurt: drop-shadow(0 0 14px var(--color-blood)) brightness(1.7);
+  --filter-healed: drop-shadow(0 0 14px var(--color-necromancy)) brightness(1.4);
+  --filter-beam: drop-shadow(0 0 24px var(--color-darkhold)) brightness(1.3);
+  --filter-taken: drop-shadow(0 0 18px var(--color-darkhold)) brightness(1.6) saturate(0.4);
+  --filter-armor-break: drop-shadow(0 0 16px var(--color-bone)) brightness(1.7);
+  --opacity-stain: 0.55;
+  --opacity-map-stain: 0.3;
+
+  /* ---------- Motion (DESIGN.md section 6): nothing that responds to the player runs over 400ms ---------- */
+  --dur-press: 100ms;
+  --dur-fast: 150ms;
+  --dur-med: 250ms;
+  --dur-hit: 300ms;
+  --dur-die: 350ms;
+  --dur-reduced: 1ms;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-in: cubic-bezier(0.6, 0, 0.9, 0.4);
+  --ease-punch: cubic-bezier(0.3, 1.6, 0.5, 1);
+  --shake-distance: 9px;
+  --shake-settle: 4px;
+  --press-depth: 3px;
+  --die-drop: 14px;
+  --die-scale: 0.92;
+  --pop-scale: 1.18;
+  --dur-shed: 350ms;
+  --shed-drop: 46px;
+  --shed-spin: 40deg;
+  --taken-rise: -22px;
+  --flip-from: 0.1 1;
+
+  /* Health bars drain, damage numbers punch out, rise and fall away (DESIGN.md section 6).
+     The lost chunk of a health bar lingers for --dur-loss-hold, then follows the bar down. */
+  --dur-drain: 250ms;
+  --dur-loss-hold: 120ms;
+  --dur-loss: 250ms;
+  --dur-number: 400ms;
+  --dur-number-stagger: 120ms;
+  --number-top: 30%;
+  --number-punch-rise: 10px;
+  --number-rise: 26px;
+  --number-fall: 12px;
+  --number-scale-start: 0.5;
+  --number-scale-punch: 1.3;
+  --number-scale-end: 0.9;
+  --z-number: 1;
+
+  /* ---------- Ambient life (DESIGN.md sections 1 and 5) ----------
+     Idle loops that respond to nothing: torch flicker and breathing. Exempt from the 400ms rule.
+     Slow, faint, and irregular: the cycle lengths share no common beat, so the pattern never visibly repeats.
+     --clock is set by render.js on every redraw; the negative delay keeps each loop in step with the page
+     clock, so a redrawn element picks up mid-cycle instead of restarting. */
+  --clock-unit: -1ms;
+  --ambient-delay: calc(var(--clock, 0) * var(--clock-unit));
+  --ease-ambient: ease-in-out;
+  --dur-flicker: 3.7s;
+  --dur-sway: 5.3s;
+  --dur-flame: 2.3s;
+  --dur-flame-fade: 1.7s;
+  --dur-accent-flicker: 4.1s;
+  --dur-breathe: 2.9s;
+  --dur-breathe-player: 3.6s;
+  --torch-stagger: 1.9s;
+  --flicker-low: 0.78;
+  --flicker-mid: 0.9;
+  --sway-low: 0.97;
+  --sway-high: 1.035;
+  --flame-tall: 0.95 1.07;
+  --flame-short: 1.03 0.94;
+  --accent-dim: brightness(0.92);
+  --accent-bright: brightness(1.06);
+  --breathe-in: 1.012 1.03;
+
+  --z-overlay: 10;
+}
+
+/* Card tokens that depend on the card's own school color. --school is set on each card from its data,
+   so these must be computed on the card itself rather than on :root. */
+.card {
+  --card-edge: var(--color-ink);
+  --card-ornament: var(--color-gilt-deep);
+  --shadow-rarity: 0 0 0 0 transparent;
+  --card-stock: var(--color-vellum);
+  --card-glow: color-mix(in srgb, var(--school) 40%, transparent);
+  --card-sigil-ring: color-mix(in srgb, var(--school) 75%, var(--color-ink));
+  --surface-card:
+    radial-gradient(ellipse 90% 55% at 50% 0%, var(--falloff-lit-surface)),
+    radial-gradient(ellipse 50% 50% at 50% 50%, var(--falloff-burn)),
+    var(--card-stock);
+  --surface-grain: var(--texture-fibers), var(--texture-mottle);
+  --surface-grain-size: var(--texture-fibers-size), var(--texture-mottle-size);
+  --surface-grain-opacity: var(--opacity-stain);
+  --shadow-card-frame:
+    inset 0 0 0 var(--card-band) var(--school),
+    inset 0 0 0 calc(var(--card-band) + var(--hairline)) var(--color-ink-faded),
+    inset 0 0 22px 3px var(--card-glow);
+  --shadow-sigil:
+    0 0 0 var(--rule) var(--card-sigil-ring),
+    0 0 12px var(--card-glow),
+    0 3px 6px var(--color-pitch);
+}
+
+/* Rarity reads from the frame, never a label (DESIGN.md section 4).
+   Starter and common: one band of school color. Uncommon: the band doubled.
+   Rare: gilded: a gold band outside the school band, gilt corner ornaments (main.css) and a warm halo. */
+.card[data-rarity="uncommon"] {
+  --shadow-card-frame:
+    inset 0 0 0 var(--card-band) var(--school),
+    inset 0 0 0 calc(var(--card-band) + var(--hairline)) var(--color-ink-faded),
+    inset 0 0 0 calc(var(--card-band) + var(--hairline) + var(--card-band-gap)) var(--card-stock),
+    inset 0 0 0 calc(var(--card-band) + var(--hairline) + var(--card-band-gap) + var(--card-band-inner)) var(--school),
+    inset 0 0 0 calc(var(--card-band) + var(--hairline) * 2 + var(--card-band-gap) + var(--card-band-inner)) var(--color-ink-faded),
+    inset 0 0 22px 3px var(--card-glow);
+}
+.card[data-rarity="rare"] {
+  --card-edge: var(--color-gilt);
+  --shadow-card-frame:
+    inset 0 0 0 var(--card-band) var(--color-gilt),
+    inset 0 0 0 calc(var(--card-band) + var(--hairline)) var(--color-gilt-deep),
+    inset 0 0 0 calc(var(--card-band) * 2 + var(--hairline)) var(--school),
+    inset 0 0 0 calc(var(--card-band) * 2 + var(--hairline) * 2) var(--color-ink-faded),
+    inset 0 0 22px 3px var(--card-glow);
+  --shadow-rarity:
+    0 0 0 var(--hairline) var(--color-gilt-deep),
+    0 0 18px var(--color-gilt-glow);
+}
+
+/* The Dealer's Table: the backs of his cards, and a color for each face so pairs read at a glance. */
+.memory-card {
+  --surface-card-back:
+    repeating-linear-gradient(45deg, var(--color-ink-rule) 0 var(--hairline), transparent var(--hairline) 9px),
+    repeating-linear-gradient(-45deg, var(--color-ink-rule) 0 var(--hairline), transparent var(--hairline) 9px),
+    radial-gradient(ellipse 70% 60% at 50% 40%, var(--falloff-held)),
+    linear-gradient(to bottom, var(--color-stone-warm), var(--color-stone-deep));
+}
+.memory-card {
+  --face-ink: color-mix(in srgb, var(--face) 78%, var(--color-ink));
+  --glow-face: 0 0 18px color-mix(in srgb, var(--face) 40%, transparent);
+  --filter-glyph: drop-shadow(0 1px 0 var(--color-ink));
+}
+.memory-card[data-face="0"] { --face: var(--color-necromancy); }
+.memory-card[data-face="1"] { --face: var(--color-darkhold); }
+.memory-card[data-face="2"] { --face: var(--color-elemental); }
+.memory-card[data-face="3"] { --face: var(--color-blood); }
+.memory-card[data-face="4"] { --face: var(--color-flame); }
+.memory-card[data-face="5"] { --face: var(--color-ember); }
+.memory-card[data-face="6"] { --face: var(--color-iron); }
+.memory-card[data-face="7"] { --face: var(--color-bones); }
+.memory-card[data-face="8"] { --face: var(--color-torch); }
+.memory-card[data-face="9"] { --face: var(--color-risen); }
+
+/* Relics: the edge tells the rarity, the way a card's frame does. */
+.relic { --relic-edge: var(--color-iron); --relic-glow: transparent; --glow-relic: 0 0 18px var(--relic-glow); }
+.relic[data-rarity="uncommon"] { --relic-edge: var(--color-darkhold); --relic-glow: color-mix(in srgb, var(--color-darkhold) 30%, transparent); }
+.relic[data-rarity="rare"] { --relic-edge: var(--color-gilt); --relic-glow: var(--color-gilt-glow); }
+
+/* Ancient: older than the book itself. Scorched stock, an ember-gilt-school triple edge in a black border,
+   gilt corner ornaments and an ember halo. */
+.card[data-rarity="ancient"] {
+  --card-stock: color-mix(in srgb, var(--color-vellum) 74%, var(--color-vellum-burnt));
+  --card-edge: var(--color-pitch);
+  --card-ornament: var(--color-gilt-deep);
+  --ornament-inset: var(--ornament-inset-ancient);
+  --shadow-card-frame:
+    inset 0 0 0 var(--card-band) var(--color-ember),
+    inset 0 0 0 calc(var(--card-band) + var(--hairline)) var(--color-pitch),
+    inset 0 0 0 calc(var(--card-band) * 2 + var(--hairline)) var(--color-gilt),
+    inset 0 0 0 calc(var(--card-band) * 2 + var(--hairline) * 2) var(--color-pitch),
+    inset 0 0 0 calc(var(--card-band) * 3 + var(--hairline) * 2) var(--school),
+    inset 0 0 0 calc(var(--card-band) * 3 + var(--hairline) * 3) var(--color-ink-faded),
+    inset 0 0 26px 4px var(--card-glow);
+  --shadow-rarity:
+    0 0 0 var(--hairline) var(--color-ember),
+    0 0 24px var(--color-ember-glow);
+}
+
+/* Companions wear their school's color: on their HUD seal and their plaque. */
+.medallion, .companion {
+  --companion-color: color-mix(in srgb, var(--school) 72%, var(--color-bone));
+  --shadow-medallion:
+    0 0 0 var(--rule) color-mix(in srgb, var(--school) 70%, var(--color-ink)),
+    0 0 10px color-mix(in srgb, var(--school) 45%, transparent);
+  --glow-companion: 0 0 22px color-mix(in srgb, var(--school) 22%, transparent);
+}
+
+/* Risen creatures fight for you: their eyes and their intent tag burn necromancy green instead of blood red.
+   Health bars, damage numbers and hit flashes stay red: those mean damage, whoever takes it. */
+.unit.summon {
+  --color-blood: var(--color-necromancy);
+  --color-blood-glow: var(--color-necro-glow);
+  --glow-intent: 0 0 18px var(--color-necro-glow);
+  --shadow-text-blood: 0 0 14px var(--color-necro-glow), 0 1px 0 var(--color-pitch);
+}
+
+/* Curses carry no school color: dead, ashen, unappealing on purpose (DESIGN.md section 4). */
+.card[data-school="curse"] {
+  --card-stock: var(--color-ash);
+  --card-glow: transparent;
+}
