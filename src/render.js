@@ -69,6 +69,7 @@ export function renderScreen(root, app) {
 
 // A card as it appears anywhere: hand, rewards, shop, deck. In a fight it can carry the modifiers acting on
 // it right now (beside the base text, never folded into it) and the shot the player has called.
+// The page: cost and name at the head, a recessed art well, then the rules text with its numbers in bold.
 function cardFace(card, { action, uid, index, selected, dim, reason, mods = [], call } = {}) {
   const school = card.school ?? 'curse'; // curses in cards.json carry no school
   const sigil = document.getElementById(`sigil-${school}`) ? school : 'neutral';
@@ -81,15 +82,40 @@ function cardFace(card, { action, uid, index, selected, dim, reason, mods = [], 
     <button class="card ${selected ? 'selected' : ''} ${dim ? 'unplayable' : ''}" ${hooks}
             data-school="${esc(school)}" data-rarity="${esc(card.rarity ?? 'curse')}"
             style="--school: var(--school-${esc(school)}, var(--school-neutral))">
-      <span class="cost" aria-label="Cost">${esc(card.cost ?? '–')}</span>
-      <span class="card-name">${esc(card.name)}</span>
-      <span class="card-text">${esc(card.text)}</span>
+      <span class="edge" aria-hidden="true"></span>
+      <span class="card-head">
+        <span class="cost" aria-label="Cost">${esc(card.cost ?? '–')}</span>
+        <span class="card-name">${esc(card.name)}</span>
+      </span>
+      <span class="art">
+        <svg class="art-glyph" aria-hidden="true"><use href="#${artOf(card, school)}"/></svg>
+        <svg class="sigil" role="img" aria-label="${esc(school)}"><use href="#sigil-${esc(sigil)}"/></svg>
+      </span>
+      <span class="card-text">${inked(card.text)}</span>
       ${mods.length ? `<span class="card-mods">${mods.map((mod) => `<span class="card-mod">${esc(mod)}</span>`).join('')}</span>` : ''}
       ${call !== undefined ? `<span class="call-tag">Call ${esc(call || '?')}</span>` : ''}
       ${reason ? `<span class="card-reason">${esc(reason)}</span>` : ''}
-      <svg class="sigil" role="img" aria-label="${esc(school)}"><use href="#sigil-${esc(sigil)}"/></svg>
     </button>`;
 }
+
+// The art well shows what a card mainly does: the first of its effects that has a glyph, else its school.
+const ART_GLYPHS = {
+  damage: 'icon-sword', goldenLight: 'icon-sword',
+  block: 'icon-shield', blockPerSummon: 'icon-shield',
+  summon: 'sigil-necromancy', reanimate: 'sigil-necromancy', raiseAllCorpses: 'sigil-necromancy',
+  buffSummons: 'sigil-necromancy', consumeSummon: 'sigil-necromancy',
+  heal: 'icon-heart', healFull: 'icon-heart',
+  draw: 'icon-deck', addRandomCard: 'icon-deck',
+  energy: 'icon-flame',
+  status: 'icon-target', debuffStat: 'icon-target',
+};
+function artOf(card, school) {
+  const effect = (card.effects ?? []).find((e) => ART_GLYPHS[e.type]);
+  return effect ? ART_GLYPHS[effect.type] : `sigil-${document.getElementById(`sigil-${school}`) ? school : 'neutral'}`;
+}
+
+// Rules text with its numbers (and X) set in bold, so the arithmetic stands out.
+const inked = (text) => esc(text).replace(/\b(\d+|X)\b/g, '<b>$1</b>');
 
 const message = (app) => (app.ui.message ? `<p class="board-message" role="status">${esc(app.ui.message)}</p>` : '');
 
@@ -812,9 +838,17 @@ const INTENT_VIEWS = {
   summon: (i, combat) => ({ tone: 'scheme', body: `<span class="what">Calls</span><b>${esc(i.count ?? 1)}</b><span class="what">${esc(combat.data.enemiesById[i.id]?.name ?? i.id)}</span>` }),
 };
 
+// The target is tinted by who it is: you (blood), one of your summons (risen green), an enemy (bone).
+function targetKind(combat, name) {
+  if (name === combat.player.name) return 'you';
+  return livingSummons(combat).some((summon) => summon.name === name) ? 'summon' : 'enemy';
+}
+
 function intentView(combat, intent) {
   const view = INTENT_VIEWS[intent.type]?.(intent, combat) ?? { tone: 'scheme', body: `<span class="what">${esc(intent.type)}</span>` };
-  const target = intent.targetName ? `<span class="arrow">→</span><span class="who">${esc(intent.targetName)}</span>` : '';
+  const target = intent.targetName
+    ? `<span class="arrow">→</span><span class="who ${targetKind(combat, intent.targetName)}">${esc(intent.targetName)}</span>`
+    : '';
   return `<span class="intent ${view.tone}">${view.body}${target}</span>`;
 }
 
@@ -877,8 +911,18 @@ function entryView(record) {
   return `
     <div class="log-entry ${classes}">
       <div class="log-title">${esc(title)}</div>
-      ${lines.map((line) => `<div class="log-line">${esc(line)}</div>`).join('')}
+      ${lines.map(lineView).join('')}
     </div>`;
+}
+
+// One line of arithmetic, after it resolved. The steps sit back; the damage that landed and the HP it moved
+// stand out, every number in bold figures.
+function lineView(line) {
+  const numbers = esc(line).replace(/\d+(?:\.\d+)?/g, '<b>$&</b>');
+  const damage = numbers.replace(/= <b>(\d+)<\/b> damage/, '= <b class="dmg">$1</b> damage');
+  // Prefixed like the entry kinds: bare "step" or "outcome" would collide with layout classes.
+  const role = damage !== numbers ? 'line-result' : / → <b>/.test(numbers) && /HP|block/.test(line) ? 'line-lands' : 'line-step';
+  return `<div class="log-line ${role}">${damage}</div>`;
 }
 
 function prompt(app) {

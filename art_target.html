@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dungeon Run — Art Target</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=Spectral:ital,wght@0,400;0,600;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0a0807;
+  --stone-900:#13100d;
+  --stone-800:#1c1814;
+  --stone-700:#2a2521;
+  --stone-600:#3a332c;
+  --vellum:#d8c9ad;
+  --vellum-dim:#9d9078;
+  --torch:#e8a33d;
+  --torch-hot:#ffd089;
+  --blood:#8f1f1f;
+  --danger:#c1292e;
+  --necro:#7fb069;
+  --dark:#8b5cf6;
+  --elem:#f5d76e;
+  --bone:#cbbfa6;
+
+  --d-fast:160ms;
+  --d-base:260ms;
+  --d-slow:400ms;
+
+  --font-display:"IM Fell English SC",serif;
+  --font-text:"Spectral",Georgia,serif;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  font-family:var(--font-text);
+  color:var(--vellum);
+  background:var(--ink);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ---- texture + light ---- */
+.room{
+  position:relative;
+  min-height:100vh;
+  padding:14px 16px 18px;
+  background:
+    radial-gradient(90% 55% at 50% 2%, rgba(232,163,61,.17), transparent 62%),
+    radial-gradient(60% 40% at 4% 38%, rgba(232,163,61,.13), transparent 60%),
+    radial-gradient(60% 40% at 96% 38%, rgba(232,163,61,.13), transparent 60%),
+    radial-gradient(120% 90% at 50% 120%, rgba(143,31,31,.14), transparent 55%),
+    linear-gradient(180deg,#16120f 0%, #0d0b09 48%, #070605 100%);
+  isolation:isolate;
+}
+.room::before{
+  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4'/></filter><rect width='220' height='220' filter='url(%23n)' opacity='.5'/></svg>");
+  opacity:.055;mix-blend-mode:overlay;
+}
+.room::after{
+  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  box-shadow:inset 0 0 180px 60px rgba(0,0,0,.92), inset 0 0 50px 10px rgba(0,0,0,.6);
+}
+.room>*{position:relative;z-index:1}
+
+@keyframes flicker{
+  0%,100%{opacity:.95}
+  12%{opacity:.78}
+  19%{opacity:1}
+  33%{opacity:.84}
+  47%{opacity:.97}
+  61%{opacity:.74}
+  78%{opacity:1}
+}
+.flicker{animation:flicker 5.5s steps(1,end) infinite}
+
+/* ---- top bar ---- */
+.bar{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:9px 13px;
+  border:1px solid #3a332c;
+  border-radius:3px 10px 4px 9px;
+  background:linear-gradient(180deg,#241f1a,#15120f);
+  box-shadow:inset 0 1px 0 rgba(216,201,173,.07), inset 0 -10px 22px rgba(0,0,0,.6), 0 6px 18px rgba(0,0,0,.5);
+}
+.stat{display:flex;align-items:baseline;gap:6px;white-space:nowrap}
+.stat .k{font-family:var(--font-display);font-size:11px;letter-spacing:.09em;color:var(--vellum-dim)}
+.stat .v{font-weight:800;font-size:19px;font-variant-numeric:tabular-nums;text-shadow:0 0 14px rgba(232,163,61,.3)}
+.v.hp{color:#e0776f}
+.v.blk{color:#8fb8d6}
+.v.en{color:var(--torch-hot)}
+.v.au{color:var(--elem)}
+.v.br{color:var(--necro)}
+.bar .spacer{flex:1}
+.depth{font-family:var(--font-display);font-size:12px;letter-spacing:.14em;color:var(--vellum-dim)}
+
+/* health bar */
+.hpwrap{flex:1 1 180px;min-width:150px}
+.hpbar{
+  height:11px;border:1px solid #4a4038;border-radius:2px;overflow:hidden;
+  background:#120f0d;box-shadow:inset 0 2px 6px rgba(0,0,0,.9);
+}
+.hpfill{
+  height:100%;width:67%;
+  background:linear-gradient(180deg,#b8403a,#6d1d1c);
+  box-shadow:0 0 12px rgba(193,41,46,.55), inset 0 1px 0 rgba(255,255,255,.14);
+  transition:width var(--d-base) cubic-bezier(.3,.9,.3,1);
+}
+
+/* ---- enemy stage ---- */
+.stage{
+  margin:20px 0 10px;display:flex;justify-content:center;gap:34px;align-items:flex-end;flex-wrap:wrap;
+}
+.foe{display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer}
+.intent{
+  font-family:var(--font-display);font-size:12.5px;letter-spacing:.06em;
+  padding:4px 11px;color:#f1ddc0;
+  border:1px solid #5a4a36;border-radius:2px 8px 2px 8px;
+  background:linear-gradient(180deg,rgba(60,42,22,.95),rgba(26,19,13,.95));
+  box-shadow:0 0 16px rgba(232,163,61,.2), inset 0 1px 0 rgba(255,214,150,.14);
+}
+.intent b{color:var(--danger);font-size:14px;font-variant-numeric:tabular-nums}
+.intent .tgt{color:var(--necro)}
+
+@keyframes breathe{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-4px) scale(1.012)}}
+.sprite{animation:breathe 4.2s ease-in-out infinite;filter:drop-shadow(0 14px 18px rgba(0,0,0,.85))}
+
+.foe .nm{font-family:var(--font-display);font-size:13px;letter-spacing:.11em;color:var(--bone)}
+.foe .fhp{
+  font-size:12.5px;font-variant-numeric:tabular-nums;color:#e0776f;font-weight:600;
+}
+.armor{
+  font-family:var(--font-display);font-size:10.5px;letter-spacing:.07em;
+  color:#9fc5dd;border:1px solid #37536a;border-radius:2px;
+  padding:2px 7px;background:rgba(30,52,70,.45);
+}
+
+/* ---- summon row ---- */
+.allies{display:flex;gap:12px;justify-content:center;margin:14px 0 6px;flex-wrap:wrap}
+.ally{
+  display:flex;align-items:center;gap:8px;
+  padding:6px 11px 6px 8px;
+  border:1px solid #3d4a36;border-radius:2px 9px 2px 9px;
+  background:linear-gradient(180deg,rgba(38,48,33,.9),rgba(16,20,14,.95));
+  box-shadow:0 0 18px rgba(127,176,105,.1), inset 0 1px 0 rgba(180,220,160,.08);
+}
+.ally .an{font-family:var(--font-display);font-size:12px;letter-spacing:.06em;color:#bcd6ac}
+.ally .as{font-size:12px;font-variant-numeric:tabular-nums;color:var(--vellum-dim)}
+.ally .as b{color:#e0776f}
+
+/* ---- hand ---- */
+.hand{
+  display:flex;gap:10px;justify-content:center;align-items:flex-end;
+  margin-top:16px;padding-bottom:6px;flex-wrap:wrap;
+}
+.card{
+  position:relative;
+  width:142px;min-height:196px;
+  padding:9px 10px 11px;
+  display:flex;flex-direction:column;
+  cursor:pointer;
+  border-radius:3px 11px 3px 11px;
+  background:
+    linear-gradient(180deg,#2b2419 0%,#1b1710 56%,#120f0a 100%);
+  border:1px solid #574a37;
+  box-shadow:
+    inset 0 0 0 1px rgba(216,201,173,.07),
+    inset 0 1px 0 rgba(216,201,173,.13),
+    inset 0 -26px 40px rgba(0,0,0,.6),
+    0 10px 22px rgba(0,0,0,.72);
+  transition:transform var(--d-fast) ease, box-shadow var(--d-fast) ease;
+}
+.card::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='c'><feTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='3'/></filter><rect width='160' height='160' filter='url(%23c)' opacity='.6'/></svg>");
+  opacity:.07;mix-blend-mode:overlay;
+}
+.card:hover{transform:translateY(-9px);box-shadow:inset 0 0 0 1px rgba(216,201,173,.1), inset 0 -26px 40px rgba(0,0,0,.6), 0 18px 30px rgba(0,0,0,.8)}
+
+.card .edge{position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:2px}
+.card.necro .edge{background:linear-gradient(180deg,transparent,var(--necro),transparent);box-shadow:0 0 14px var(--necro)}
+.card.dark  .edge{background:linear-gradient(180deg,transparent,var(--dark),transparent);box-shadow:0 0 14px var(--dark)}
+.card.elem  .edge{background:linear-gradient(180deg,transparent,var(--elem),transparent);box-shadow:0 0 14px var(--elem)}
+
+.chead{display:flex;align-items:flex-start;gap:8px;margin-left:5px}
+.cost{
+  flex:0 0 auto;width:28px;height:28px;display:grid;place-items:center;
+  font-family:var(--font-display);font-size:16px;color:#1a140c;font-weight:700;
+  background:radial-gradient(circle at 34% 28%,var(--torch-hot),var(--torch) 58%,#9c661f 100%);
+  border-radius:50% 50% 48% 52%;
+  box-shadow:0 0 16px rgba(232,163,61,.5), inset 0 -3px 6px rgba(0,0,0,.35);
+}
+.cname{font-family:var(--font-display);font-size:13.5px;line-height:1.15;letter-spacing:.04em;color:#ecdcbd;padding-top:3px;text-shadow:0 1px 0 #000}
+
+.art{
+  margin:9px 3px 8px 5px;height:62px;border-radius:2px;
+  border:1px solid rgba(216,201,173,.1);
+  background:radial-gradient(70% 90% at 50% 40%, rgba(232,163,61,.1), transparent 70%), #100d09;
+  box-shadow:inset 0 3px 14px rgba(0,0,0,.85);
+  display:grid;place-items:center;overflow:hidden;
+}
+.ctext{
+  margin-left:5px;font-size:11.6px;line-height:1.38;color:#c3b69b;
+}
+.ctext b{color:#efe2c6;font-variant-numeric:tabular-nums}
+.ctext .g{color:var(--necro)}
+.ctext .p{color:#b79bf5}
+.ctext .y{color:var(--elem)}
+.rare{
+  position:absolute;right:9px;bottom:7px;font-family:var(--font-display);
+  font-size:9px;letter-spacing:.17em;color:#7e7360;
+}
+.card.unplayable{filter:grayscale(.75) brightness(.55);cursor:not-allowed}
+
+/* ---- log ---- */
+.log{
+  margin-top:16px;padding:10px 13px;
+  border:1px solid #2f2922;border-left:2px solid var(--torch);
+  background:linear-gradient(180deg,rgba(18,15,12,.9),rgba(10,8,7,.9));
+  border-radius:0 8px 8px 0;
+  font-size:12.3px;line-height:1.62;color:#9c9078;max-width:460px;
+}
+.log .h{font-family:var(--font-display);font-size:11px;letter-spacing:.16em;color:#6e6453;margin-bottom:5px}
+.log .ln{margin-left:11px}
+.log b{color:#efe2c6;font-variant-numeric:tabular-nums}
+.log .dmg{color:var(--danger);font-weight:700}
+.log .step{color:#7e7360}
+
+.endturn{
+  margin-top:14px;display:inline-block;
+  font-family:var(--font-display);font-size:13px;letter-spacing:.16em;
+  padding:10px 24px;color:#f4e3c2;cursor:pointer;
+  border:1px solid #6a5636;border-radius:2px 10px 2px 10px;
+  background:linear-gradient(180deg,#3a2c17,#1d160d);
+  box-shadow:0 0 22px rgba(232,163,61,.17), inset 0 1px 0 rgba(255,214,150,.16);
+  transition:box-shadow var(--d-fast) ease, transform var(--d-fast) ease;
+}
+.endturn:hover{box-shadow:0 0 34px rgba(232,163,61,.34), inset 0 1px 0 rgba(255,214,150,.22);transform:translateY(-1px)}
+
+.foot{margin-top:22px;font-size:11px;color:#5d5547;letter-spacing:.03em;max-width:620px;line-height:1.6}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="room">
+
+  <!-- HUD -->
+  <div class="bar flicker">
+    <div class="stat"><span class="k">HP</span><span class="v hp">47/70</span></div>
+    <div class="hpwrap"><div class="hpbar"><div class="hpfill"></div></div></div>
+    <div class="stat"><span class="k">BLOCK</span><span class="v blk">8</span></div>
+    <div class="stat"><span class="k">ENERGY</span><span class="v en">3/3</span></div>
+    <div class="stat"><span class="k">GOLD</span><span class="v au">185</span></div>
+    <div class="stat"><span class="k">BREATH</span><span class="v br">II</span></div>
+    <div class="spacer"></div>
+    <div class="depth">DEPTH I &nbsp;·&nbsp; WET STONE</div>
+  </div>
+
+  <!-- ENEMIES -->
+  <div class="stage">
+
+    <div class="foe">
+      <div class="intent">⚔ <b>11</b> → <span class="tgt">Skeleton</span></div>
+      <svg class="sprite" width="206" height="150" viewBox="0 0 206 150" aria-label="Corrupted Crab">
+        <defs>
+          <radialGradient id="shell" cx="42%" cy="30%">
+            <stop offset="0%" stop-color="#6d3440"/><stop offset="55%" stop-color="#43202a"/><stop offset="100%" stop-color="#1d0d12"/>
+          </radialGradient>
+          <radialGradient id="shard" cx="45%" cy="35%">
+            <stop offset="0%" stop-color="#e9d6ff"/><stop offset="45%" stop-color="#a97cf6"/><stop offset="100%" stop-color="#4b2690"/>
+          </radialGradient>
+          <filter id="glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <!-- legs -->
+        <g stroke="#3a1a22" stroke-width="7" fill="none" stroke-linecap="round">
+          <path d="M60 96 L28 118 L14 108"/><path d="M64 104 L36 132 L20 128"/>
+          <path d="M146 96 L178 118 L192 108"/><path d="M142 104 L170 132 L186 128"/>
+        </g>
+        <!-- claws -->
+        <g fill="#4a2129" stroke="#2a1118" stroke-width="2">
+          <path d="M52 78 q-26 -10 -34 6 q-4 14 12 16 q-14 6 -4 16 q14 10 30 -6 z"/>
+          <path d="M154 78 q26 -10 34 6 q4 14 -12 16 q14 6 4 16 q-14 10 -30 -6 z"/>
+        </g>
+        <!-- shell -->
+        <ellipse cx="103" cy="86" rx="56" ry="40" fill="url(#shell)" stroke="#200f14" stroke-width="2.5"/>
+        <!-- barnacles -->
+        <g fill="#5d4a3a" opacity=".85">
+          <circle cx="76" cy="74" r="7"/><circle cx="131" cy="80" r="6"/><circle cx="92" cy="106" r="5.5"/>
+          <circle cx="120" cy="104" r="4.5"/><circle cx="66" cy="94" r="5"/>
+        </g>
+        <!-- eyes -->
+        <g><circle cx="88" cy="63" r="6" fill="#120a0d"/><circle cx="118" cy="63" r="6" fill="#120a0d"/>
+           <circle cx="89.5" cy="61" r="2.2" fill="#ffb347"/><circle cx="119.5" cy="61" r="2.2" fill="#ffb347"/></g>
+        <!-- shard -->
+        <g filter="url(#glow)">
+          <path d="M103 18 L120 52 L103 66 L86 52 Z" fill="url(#shard)" stroke="#d9c2ff" stroke-width="1.5"/>
+        </g>
+      </svg>
+      <div class="nm">CORRUPTED CRAB</div>
+      <div class="fhp">98 / 120</div>
+      <div class="armor">ENCRUSTED ARMOR · 3 HITS LEFT</div>
+    </div>
+
+  </div>
+
+  <!-- SUMMONS -->
+  <div class="allies">
+    <div class="ally">
+      <svg width="24" height="30" viewBox="0 0 24 30"><g fill="#c9d6bc"><circle cx="12" cy="8" r="6.5"/><rect x="10.5" y="14" width="3" height="11" rx="1.2"/><rect x="5" y="17" width="14" height="2.6" rx="1.3"/></g><circle cx="9.6" cy="7.4" r="1.7" fill="#121410"/><circle cx="14.4" cy="7.4" r="1.7" fill="#121410"/></svg>
+      <div><div class="an">SKELETON</div><div class="as"><b>10</b> HP · 5 ATK</div></div>
+    </div>
+    <div class="ally">
+      <svg width="24" height="30" viewBox="0 0 24 30"><g fill="#a89a80"><rect x="4" y="9" width="16" height="17" rx="2"/><rect x="7" y="4" width="4" height="6" rx="1"/><rect x="13" y="4" width="4" height="6" rx="1"/></g><g stroke="#4a4234" stroke-width="1.2"><path d="M4 15h16M4 21h16M12 9v17"/></g></svg>
+      <div><div class="an">BONE WALL</div><div class="as"><b>14</b> HP · 0 ATK</div></div>
+    </div>
+  </div>
+
+  <!-- HAND -->
+  <div class="hand">
+
+    <div class="card necro">
+      <div class="edge"></div>
+      <div class="chead"><div class="cost">1</div><div class="cname">Reanimate</div></div>
+      <div class="art">
+        <svg width="78" height="52" viewBox="0 0 78 52"><g stroke="#7fb069" stroke-width="2" fill="none" opacity=".9"><path d="M12 44 q10 -22 27 -22 q17 0 27 22"/></g><circle cx="39" cy="19" r="8" fill="#1a2416" stroke="#7fb069" stroke-width="1.6"/><g fill="#7fb069"><circle cx="36" cy="18" r="1.8"/><circle cx="42" cy="18" r="1.8"/></g><g stroke="#3e5c33" stroke-width="1.4"><path d="M20 46h38"/></g></svg>
+      </div>
+      <div class="ctext">Pay <b>X</b> health. Raise the last enemy that died with <b class="g">2X</b> HP. It attacks for <b>half</b> its original attack.</div>
+      <div class="rare">STARTER</div>
+    </div>
+
+    <div class="card elem">
+      <div class="edge"></div>
+      <div class="chead"><div class="cost">2</div><div class="cname">Thunderbolt</div></div>
+      <div class="art">
+        <svg width="78" height="52" viewBox="0 0 78 52"><path d="M44 2 L26 26 h12 L30 50 L52 22 H40 Z" fill="#f5d76e" stroke="#fff3c4" stroke-width="1.4" opacity=".95"/><circle cx="39" cy="26" r="21" fill="none" stroke="#f5d76e" stroke-width=".8" opacity=".3"/></svg>
+      </div>
+      <div class="ctext">Deal <b class="y">15</b> damage.</div>
+      <div class="rare">COMMON</div>
+    </div>
+
+    <div class="card dark">
+      <div class="edge"></div>
+      <div class="chead"><div class="cost">2</div><div class="cname">Rend Soul</div></div>
+      <div class="art">
+        <svg width="78" height="52" viewBox="0 0 78 52"><g stroke="#8b5cf6" stroke-width="2.4" fill="none" stroke-linecap="round"><path d="M18 6 L54 46"/><path d="M26 4 L62 44"/></g><path d="M39 10 q10 14 0 32 q-10 -18 0 -32" fill="#2a1a4a" stroke="#b79bf5" stroke-width="1.2"/></svg>
+      </div>
+      <div class="ctext">Deal <b class="p">14</b> damage. Lose <b>4</b> HP.</div>
+      <div class="rare">UNCOMMON</div>
+    </div>
+
+    <div class="card elem">
+      <div class="edge"></div>
+      <div class="chead"><div class="cost">1</div><div class="cname">Golden Light</div></div>
+      <div class="art">
+        <svg width="78" height="52" viewBox="0 0 78 52"><defs><linearGradient id="beam" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fff6d8" stop-opacity=".95"/><stop offset="100%" stop-color="#f5d76e" stop-opacity="0"/></linearGradient></defs><path d="M30 0 h18 l10 50 h-38 z" fill="url(#beam)"/><circle cx="39" cy="44" r="7" fill="none" stroke="#f5d76e" stroke-width="1.4" opacity=".8"/></svg>
+      </div>
+      <div class="ctext">Pay <b class="y">20</b> gold and <b>X</b> health. Deal <b class="y">X×3</b> damage.</div>
+      <div class="rare">RARE</div>
+    </div>
+
+    <div class="card necro unplayable">
+      <div class="edge"></div>
+      <div class="chead"><div class="cost">3</div><div class="cname">Stormcall</div></div>
+      <div class="art">
+        <svg width="78" height="52" viewBox="0 0 78 52"><g fill="#f5d76e" opacity=".9"><path d="M22 4 L12 24 h7 L14 46 L30 20 h-8 Z"/><path d="M52 4 L42 24 h7 L44 46 L60 20 h-8 Z"/></g></svg>
+      </div>
+      <div class="ctext">Deal <b>7</b> damage to ALL enemies twice.</div>
+      <div class="rare">RARE</div>
+    </div>
+
+  </div>
+
+  <!-- LOG -->
+  <div class="log">
+    <div class="h">COMBAT LOG</div>
+    <div>Thunderbolt → Corrupted Crab</div>
+    <div class="ln step">15 base + <b>2</b> Strength = <b>17</b></div>
+    <div class="ln step">× 0.5 Encrusted Armor = <b>8</b></div>
+    <div class="ln">Crab: <b>106</b> → <b>98</b> HP &nbsp;<span class="dmg">−8</span></div>
+    <div class="ln step">Armor: 4 hits → 3 hits remaining</div>
+  </div>
+
+  <div class="endturn">END TURN</div>
+
+  <div class="foot">
+    ART TARGET — not wired to game logic. Hand this to Claude Code as the visual bar for the CSS/SVG pass.
+  </div>
+
+</div>
+</body>
+</html>

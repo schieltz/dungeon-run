@@ -7,7 +7,7 @@
 //
 // FILES must list every file the game loads. The test suite checks it against the folders.
 
-const VERSION = 'dungeon-run-v1'; // a new name drops every older cache on the next visit
+const VERSION = 'dungeon-run-v2'; // a new name drops every older cache on the next visit
 
 const FILES = [
   './',
@@ -38,7 +38,7 @@ const FILES = [
 ];
 
 // The same stylesheet index.html links. Its font files are fetched and cached along with it.
-const FONT_CSS = 'https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;700;800&family=Grenze+Gotisch:wght@600;800&display=swap';
+const FONT_CSS = 'https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=Spectral:ital,wght@0,400;0,600;0,800;1,400&display=swap';
 const FONT_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com'];
 
 // How long to wait on a slow network before falling back to the cached copy (a dungeon has bad signal).
