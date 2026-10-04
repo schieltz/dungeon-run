@@ -7,9 +7,10 @@ import { catchUpEnemies, createCombat, endPlayerTurn, freezeCombat, livingEnemie
 import { canCallShot, cardDef, needsPayment, paymentRange, playability, playCard, sacrificeInFight, targetMode } from './cards.js';
 import { assignSummonTarget, livingSummons } from './summons.js';
 import { claimRewards, currentNode, enterNode, FIGHT_TYPES, generateMap, settleFight, takeRewardCard } from './map.js';
-import { buyCard, openShop, removeCard, restHeal, upgradeCard } from './shop.js';
+import { buyCard, openShop, removeCard, restHeal, takeRestAction, upgradeCard } from './shop.js';
 import {
-  bledOut, chooseOption, eventChoices, flipMemoryCard, openEvent, purgeCard, runEffectBuilt, spendFightBuffs, wagerDraw, wagerStop,
+  bledOut, choiceRequirementBuilt, chooseOption, eventChoices, flipMemoryCard, openEvent, purgeCard, runEffectBuilt, spendFightBuffs,
+  wagerDraw, wagerStop,
 } from './events.js';
 import {
   clearSave, createRunState, dismissCompanion, loadBest, loadSave, recordBest, sacrificeOutsideFight, takeCompanion, writeSave,
@@ -111,10 +112,20 @@ function checkData(data) {
       ...(event.outcomes ?? []).flatMap((outcome) => outcome.effects ?? []),
       ...(event.rules?.prizes ?? []).flatMap((prize) => prize.effects),
     ];
+    for (const choice of eventChoices(event)) {
+      if (!choiceRequirementBuilt(choice)) problems.push(`${where} requires "${choice.requires}", which isn't in the game.`);
+    }
     for (const effect of effects) {
       if (!runEffectBuilt(effect)) problems.push(`${where} uses "${effect.type}", which isn't in the game.`);
-      if (effect.type === 'addCurse') card(effect.id, where);
+      if (['addCurse', 'addCard', 'removeCard'].includes(effect.type)) card(effect.id, where);
+      if (effect.type === 'gainRelic' && effect.id && !data.relicsById[effect.id]) problems.push(`${where} gives relic "${effect.id}", but relics.json has no relic with that id.`);
       if (effect.type === 'grantRunBuff' && !data.events.runBuffs?.[effect.id]) problems.push(`${where} grants "${effect.id}", but runBuffs has nothing by that name.`);
+    }
+  }
+  for (const def of Object.values(data.cardsById).filter((c) => c.atRest)) {
+    for (const effect of def.atRest.effects) {
+      if (!runEffectBuilt(effect)) problems.push(`cards.json "${def.id}" atRest uses "${effect.type}", which isn't in the game.`);
+      if (effect.type === 'gainRelic' && effect.id && !data.relicsById[effect.id]) problems.push(`cards.json "${def.id}" atRest gives relic "${effect.id}", but relics.json has no relic with that id.`);
     }
   }
   for (const relic of data.relics.relics) {
@@ -199,6 +210,8 @@ function upToDate(combat) {
   combat.gold ??= app.run.gold;
   combat.shot ??= { bonuses: 0, energyNextTurn: 0 };
   combat.cleansed ??= false;
+  combat.relics ??= [...(app.run.relics ?? [])];
+  combat.cardsPlayed ??= 0;
   catchUpEnemies(combat);
   return combat;
 }
@@ -542,6 +555,16 @@ const ACTIONS = {
     toMap();
   },
   'rest-upgrade': () => { app.view.picker = { purpose: 'upgrade' }; },
+  // A card's own rest action (Nurture the Bound Wood Sapling): it takes the rest, like healing or upgrading.
+  'rest-card': (el) => {
+    const result = takeRestAction(app.run, app.data, el.dataset.id);
+    if (!result.ok) {
+      app.ui.message = result.reason;
+      return;
+    }
+    toMap();
+    app.ui.message = result.results.map((r) => r.text).filter(Boolean).join(' ');
+  },
 
   // Card picker
   'pick-card': (el) => {

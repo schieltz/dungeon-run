@@ -531,11 +531,32 @@
         "text": "Summon 2 Bone Walls. Gain 20 block that is not removed at the start of your next turn.",
         "effects": [{ "type": "summon", "id": "bone_wall", "count": 2 }, { "type": "block", "amount": 20, "persists": true }]
       }
+    },
+
+    {
+      "_comment": "An event card from the Ancient Tree. Rarity \"event\" keeps it out of rewards and the shop. While it's in your deck, a rest site offers its atRest action instead of resting or upgrading.",
+      "id": "bound_wood_sapling",
+      "name": "Bound Wood Sapling",
+      "school": "neutral",
+      "rarity": "event",
+      "art": "icon-sapling",
+      "cost": null,
+      "text": "Unplayable. A cutting from the Ancient Tree. Nurture it at a rest site and it grows.",
+      "unplayable": true,
+      "atRest": {
+        "label": "Nurture",
+        "text": "Plant the sapling. It grows into a Bound Wood Creature.",
+        "effects": [
+          { "type": "removeCard", "id": "bound_wood_sapling" },
+          { "type": "gainRelic", "id": "bound_wood_creature" }
+        ]
+      }
     }
   ],
 
   "curses": [
     { "id": "doubt", "name": "Doubt", "cost": null, "text": "Unplayable. At the end of your turn, lose 2 HP.", "unplayable": true, "effects": [{ "type": "delayedDamage", "amount": 2, "when": "endOfTurn" }] },
-    { "id": "dead_weight", "name": "Dead Weight", "cost": null, "text": "Unplayable. Cannot be discarded.", "unplayable": true, "retain": true }
+    { "id": "dead_weight", "name": "Dead Weight", "cost": null, "text": "Unplayable. Cannot be discarded.", "unplayable": true, "retain": true },
+    { "id": "trees_curse", "name": "Tree's Curse", "cost": null, "text": "Unplayable. At the end of your turn, if this is in your hand, take 10 damage.", "unplayable": true, "effects": [{ "type": "delayedDamage", "amount": 10, "when": "endOfTurn" }] }
   ]
 }

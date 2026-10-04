@@ -4,7 +4,7 @@
 // Pure game logic, no DOM: the event's state is plain data in app.view, so a reload picks up mid-game.
 
 import { rollCards } from './cards.js';
-import { hasRoomForCompanion, newCard, pickOne, shuffle, takeCompanion } from './state.js';
+import { hasRoomForCompanion, newCard, pickOne, pickWeighted, shuffle, takeCompanion } from './state.js';
 
 // ---------------------------------------------------------------------------
 // Run effects: what an event choice, a minigame prize or a relic pickup does to the run.
@@ -58,6 +58,17 @@ const RUN_EFFECTS = {
     for (let made = 0; made < copies; made++) run.deck.push(newCard(effect.id));
     return { text: `${count(copies, data.cardsById[effect.id].name)} added to your deck.`, card: effect.id };
   },
+  addCard: (run, data, effect) => {
+    run.deck.push(newCard(effect.id));
+    run.stats.cardsAdded += 1;
+    return { text: `${data.cardsById[effect.id].name} is added to your deck.`, card: effect.id };
+  },
+  removeCard: (run, data, effect) => {
+    const instance = run.deck.find((card) => card.id === effect.id);
+    if (!instance) return { text: '' };
+    run.deck = run.deck.filter((card) => card !== instance);
+    return { text: `${data.cardsById[effect.id].name} leaves your deck.` };
+  },
   addRandomCard: (run, data, effect) => {
     const [id] = rollCards(data, 1, { rarity: effect.rarity });
     if (!id) return { text: 'The page crumbles. Nothing to learn.' };
@@ -90,9 +101,11 @@ const RUN_EFFECTS = {
     run.skipNextReward = source;
     return { text: 'After your next fight, there will be no reward.' };
   },
+  // A named relic ("id"), one of a rarity, or, with neither, a rarity picked by the elites' odds.
   gainRelic: (run, data, effect) => {
-    const id = rollRelic(run, data, effect.rarity);
-    if (!id) return { text: 'The shelf is bare. You already carry everything on it.' };
+    if (effect.id && run.relics.includes(effect.id)) return { text: `You already carry ${data.relicsById[effect.id].name}.` };
+    const id = effect.id ?? rollRelic(run, data, effect.rarity ?? pickWeighted(data.config.rewards.eliteRelicRarityWeights));
+    if (!id) return { text: 'Nothing is left to give. You already carry every relic there is.' };
     return { ...takeRelic(run, data, id), relic: id };
   },
 };
@@ -110,8 +123,9 @@ export const bledOut = (run) => run.player.hp <= 0;
 // happen at the start of every fight (combat.js).
 
 // A relic of the asked-for rarity you don't have. If you have them all, any relic you don't have.
+// Relics marked "eventOnly" (the Ancient Tree's) only come from their event, never at random.
 export function rollRelic(run, data, rarity) {
-  const unowned = data.relics.relics.filter((relic) => !run.relics.includes(relic.id));
+  const unowned = data.relics.relics.filter((relic) => !relic.eventOnly && !run.relics.includes(relic.id));
   const ofRarity = unowned.filter((relic) => relic.rarity === rarity);
   const pool = ofRarity.length ? ofRarity : unowned;
   return pool.length ? pickOne(pool).id : null;
@@ -139,12 +153,25 @@ export function eventChoices(def) {
   return [entry, { ...def.walkAway, walkAway: true }];
 }
 
+// A choice can require something ("gold:100"). Without it the choice is shown but can't be taken.
+const CHOICE_REQUIREMENTS = {
+  gold: (run, amount) => (run.gold >= Number(amount) ? null : `You need ${amount} gold.`),
+};
+
+export function choiceBlocked(run, choice) {
+  if (!choice.requires) return null;
+  const [name, value] = choice.requires.split(':');
+  return CHOICE_REQUIREMENTS[name]?.(run, value) ?? null;
+}
+
+export const choiceRequirementBuilt = (choice) => !choice.requires || Boolean(CHOICE_REQUIREMENTS[choice.requires.split(':')[0]]);
+
 export const openEvent = (id) => ({ id, phase: 'choose', chosen: null, results: [], picking: false, game: null });
 
 export function chooseOption(run, data, state, index) {
   const def = data.eventsById[state.id];
   const choice = eventChoices(def)[index];
-  if (!choice || state.phase !== 'choose') return;
+  if (!choice || state.phase !== 'choose' || choiceBlocked(run, choice)) return;
   state.taken = index;
   state.results = runEffects(run, data, choice.effects ?? [], def.name);
   if (choice.walkAway) state.results.unshift({ text: choice.text, headline: true });

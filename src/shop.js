@@ -4,6 +4,7 @@
 
 import { canUpgrade, rollCards } from './cards.js';
 import { floorMul, newCard, randomInt } from './state.js';
+import { runEffects } from './events.js';
 
 const refused = (reason) => ({ ok: false, reason });
 
@@ -55,4 +56,17 @@ export function upgradeCard(run, data, uid) {
   if (!instance || !canUpgrade(data, instance)) return refused("That card can't be upgraded.");
   instance.upgraded = true;
   return { ok: true };
+}
+
+// A card can bring its own rest action (the Bound Wood Sapling's Nurture, "atRest" in cards.json), taken
+// instead of resting or upgrading.
+export function restActions(run, data) {
+  const ids = [...new Set(run.deck.map((card) => card.id))];
+  return ids.filter((id) => data.cardsById[id]?.atRest).map((id) => ({ cardId: id, ...data.cardsById[id].atRest }));
+}
+
+export function takeRestAction(run, data, cardId) {
+  const card = data.cardsById[cardId];
+  if (!card?.atRest || !run.deck.some((instance) => instance.id === cardId)) return refused('Nothing here to do that with.');
+  return { ok: true, results: runEffects(run, data, card.atRest.effects, card.name) };
 }

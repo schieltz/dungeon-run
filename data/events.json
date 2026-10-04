@@ -139,6 +139,38 @@
           ]
         }
       ]
+    },
+
+    {
+      "id": "ancient_tree",
+      "name": "The Ancient Tree",
+      "flavor": "Its roots have split the floor and its branches the ceiling. It was here before the dungeon. It is listening.",
+      "choices": [
+        {
+          "label": "Offer 100 gold",
+          "text": "Press the gold into its bark. It gives something back.",
+          "requires": "gold:100",
+          "effects": [
+            { "type": "loseGold", "amount": 100 },
+            { "type": "gainRelic" }
+          ]
+        },
+        {
+          "label": "Kill it",
+          "text": "Take its Tree Soul. It curses you as it dies.",
+          "effects": [
+            { "type": "gainRelic", "id": "tree_soul" },
+            { "type": "addCurse", "id": "trees_curse" }
+          ]
+        },
+        {
+          "label": "Take some of it with you",
+          "text": "Add a Bound Wood Sapling to your deck. Nurture it at a rest site and it grows into a Bound Wood Creature.",
+          "effects": [
+            { "type": "addCard", "id": "bound_wood_sapling" }
+          ]
+        }
+      ]
     }
   ]
 }

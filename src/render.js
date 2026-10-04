@@ -12,9 +12,9 @@ import {
 import { builtPassives, enemyDef, intentPreview, timedPreview } from './combat.js';
 import { livingSummons, summonIntentPreview } from './summons.js';
 import { nextChoices } from './map.js';
-import { restHealAmount } from './shop.js';
+import { restActions, restHealAmount } from './shop.js';
 import { hasRoomForCompanion, sacrificeWorksOutsideFight } from './state.js';
-import { eventChoices } from './events.js';
+import { choiceBlocked, eventChoices } from './events.js';
 
 const ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' };
 const esc = (value) => String(value).replace(/[&<>"']/g, (ch) => ESCAPES[ch]);
@@ -110,12 +110,16 @@ const ART_GLYPHS = {
   status: 'icon-target', debuffStat: 'icon-target',
 };
 function artOf(card, school) {
+  if (card.art && document.getElementById(card.art)) return card.art; // a card can name its own glyph
   const effect = (card.effects ?? []).find((e) => ART_GLYPHS[e.type]);
   return effect ? ART_GLYPHS[effect.type] : `sigil-${document.getElementById(`sigil-${school}`) ? school : 'neutral'}`;
 }
 
 // Rules text with its numbers (and X) set in bold, so the arithmetic stands out.
 const inked = (text) => esc(text).replace(/\b(\d+|X)\b/g, '<b>$1</b>');
+
+// Numbers inside display lettering are set in the text face: IM Fell's old-style figures read as letters.
+const figures = (text) => esc(text).replace(/\d+/g, '<span class="num">$&</span>');
 
 const message = (app) => (app.ui.message ? `<p class="board-message" role="status">${esc(app.ui.message)}</p>` : '');
 
@@ -319,7 +323,7 @@ function restScreen(app) {
       ${runHud(app)}
       <section class="board">
         <h2 class="board-title">A Place to Rest</h2>
-        <p class="board-prompt">A dry corner and a little fire. Rest, or work on one spell. Not both.</p>
+        <p class="board-prompt">A dry corner and a little fire. Do one thing here. Only one.</p>
         <div class="choices">
           <button class="choice" data-action="rest-heal">
             <svg class="choice-icon" aria-hidden="true"><use href="#node-rest"/></svg>
@@ -329,6 +333,11 @@ function restScreen(app) {
             <svg class="choice-icon" aria-hidden="true"><use href="#sigil-neutral"/></svg>
             <b>Upgrade</b><span>${upgradable ? 'Improve one card' : 'No card can be upgraded'}</span>
           </button>
+          ${restActions(run, data).map((action) => `
+            <button class="choice" data-action="rest-card" data-id="${esc(action.cardId)}">
+              <svg class="choice-icon" aria-hidden="true"><use href="#${esc(data.cardsById[action.cardId].art ?? 'sigil-neutral')}"/></svg>
+              <b>${esc(action.label)}</b><span>${esc(action.text)}</span>
+            </button>`).join('')}
         </div>
         <div class="actions"><button class="plain-button" data-action="leave">Leave</button></div>
         ${message(app)}
@@ -399,12 +408,16 @@ function companionSheet(app) {
 // ---------------------------------------------------------------------------
 // Relics: kept for the run. A plaque each, its edge showing its rarity like a card's frame.
 
-function relicPlaque(data, id) {
+// In a fight, a relic that counts the cards you play shows how far along the count is.
+function relicPlaque(data, id, combat) {
   const relic = data.relicsById[id];
+  const every = combat && relic.everyCardsPlayed;
+  const progress = every ? `<p class="relic-count">Cards played: <b>${combat.cardsPlayed % every.count}</b> of ${every.count}</p>` : '';
   return `
     <article class="relic" data-rarity="${esc(relic.rarity)}">
       <header class="relic-head">${icon('relic')}<h3>${esc(relic.name)}</h3></header>
       <p>${esc(relic.text)}</p>
+      ${progress}
     </article>`;
 }
 
@@ -423,7 +436,7 @@ function relicSheet(app) {
           <h2 class="board-title">Relics</h2>
           <button class="plain-button" data-action="close-sheet">Close</button>
         </header>
-        <div class="relic-list">${run.relics.map((id) => relicPlaque(data, id)).join('') || '<p class="board-prompt">You carry nothing yet.</p>'}</div>
+        <div class="relic-list">${run.relics.map((id) => relicPlaque(data, id, app.combat)).join('') || '<p class="board-prompt">You carry nothing yet.</p>'}</div>
         ${lasting.length ? `<h3 class="offer-title">Hanging over you</h3><ul class="lasting">${lasting.join('')}</ul>` : ''}
       </section>
     </div>`;
@@ -455,10 +468,13 @@ function eventChoose(app, def, state) {
     <p class="flavor-text">${esc(def.flavor)}</p>
     ${def.rules ? `<p class="board-prompt">${esc(def.rules.description)}</p>` : ''}
     <div class="event-choices">
-      ${choices.map((choice, index) => `
-        <button class="choice event-choice ${state.chosen === index ? 'selected' : ''} ${choice.walkAway ? 'walk-away' : ''}" data-action="event-choice" data-index="${index}">
-          <b>${esc(choice.label)}</b><span>${esc(choice.text)}</span>
-        </button>`).join('')}
+      ${choices.map((choice, index) => {
+        const blocked = choiceBlocked(app.run, choice);
+        return `
+        <button class="choice event-choice ${state.chosen === index ? 'selected' : ''} ${choice.walkAway ? 'walk-away' : ''}" data-action="event-choice" data-index="${index}" ${blocked ? 'disabled' : ''}>
+          <b>${figures(choice.label)}</b><span>${esc(choice.text)}</span>${blocked ? `<span class="choice-reason">${esc(blocked)}</span>` : ''}
+        </button>`;
+      }).join('')}
     </div>
     <div class="actions">
       <button class="big-button ${bleeding ? 'deadly' : ''}" data-action="event-go" ${chosen ? '' : 'disabled'}>
@@ -532,7 +548,7 @@ function wagerBoard(app, def, state) {
     <p class="tally"><span>At stake: <b>${prize ? esc(prize.label) : 'nothing yet'}</b></span><span>Your HP <b>${app.run.player.hp}</b></span></p>
     <div class="actions">
       <button class="big-button ${bleeding ? 'deadly' : ''}" data-action="wager-draw">
-        ${bleeding ? 'Tap again: this will kill you' : `Cut again: pay ${esc(cost)} HP`}
+        ${bleeding ? 'Tap again: this will kill you' : `Cut again: pay ${figures(cost)} HP`}
       </button>
       <button class="plain-button" data-action="wager-stop">${prize ? `Stop and take ${esc(prize.label)}` : 'Walk away'}</button>
     </div>`;
@@ -793,12 +809,12 @@ function armorChip(unit) {
   const { armor } = unit;
   if (!armor) return '';
   if (!armor.hitsLeft) return `<span class="chip armor broken">${esc(armor.name)}: broken</span>`;
-  return `<span class="chip armor">${esc(armor.name)} ×${esc(armor.multiplier)}: ${esc(count(armor.hitsLeft, 'hit'))} left</span>`;
+  return `<span class="chip armor">${figures(`${armor.name} ×${armor.multiplier}: ${count(armor.hitsLeft, 'hit')} left`)}</span>`;
 }
 
 // A timed ability between firings: how long until it does.
 function countdownChip(t) {
-  return `<span class="chip countdown">${esc(t.name)} in ${esc(count(t.inTurns, 'turn'))}</span>`;
+  return `<span class="chip countdown">${figures(`${t.name} in ${count(t.inTurns, 'turn')}`)}</span>`;
 }
 
 // A timed ability on the turn it fires, hung above the intent: what it does and who it lands on.
@@ -858,7 +874,7 @@ function statusChips(unit, passives, counters = []) {
   const chips = Object.entries(unit.statuses).map(([name, status]) => {
     const value = status.amount ?? status.duration;
     const shown = value === undefined ? '' : status.amount > 0 && name === 'strength' ? ` +${value}` : ` ${String(value).replace('-', '−')}`;
-    return `<span class="chip">${esc(name)}${esc(shown)}</span>`;
+    return `<span class="chip">${esc(name)}${figures(shown)}</span>`;
   });
   const traits = passives.map((passive) => `<span class="chip trait">${esc(passive.name)}</span>`);
   const all = [...chips, ...counters.filter(Boolean), ...traits];
@@ -910,7 +926,7 @@ function entryView(record) {
   const classes = kind.split(' ').map((k) => `log-${k}`).join(' '); // prefixed so they can't collide with layout classes
   return `
     <div class="log-entry ${classes}">
-      <div class="log-title">${esc(title)}</div>
+      <div class="log-title">${figures(title)}</div>
       ${lines.map(lineView).join('')}
     </div>`;
 }

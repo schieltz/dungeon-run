@@ -30,6 +30,8 @@
     "weakMultiplier": 0.75,
     "markedMultiplier": 1.5,
     "frailMultiplier": 0.75,
+    "_tangledComment": "Tangled: an enemy with any Tangled takes this much damage at the end of its turn.",
+    "tangledDamage": 6,
     "defaultDuration": 2
   },
 

@@ -1173,7 +1173,8 @@ button.stat:disabled { filter: var(--filter-unlit); }
 }
 .plain-button .icon { color: var(--color-flame); }
 /* Numbers are always set in the text face's bold figures, even inside display lettering. */
-:is(.plain-button, .big-button, .board-title, .game-title) b { font-family: var(--font-text); font-weight: var(--weight-heavy); letter-spacing: 0; }
+:is(.plain-button, .big-button, .board-title, .game-title) b, .num { font-family: var(--font-text); font-weight: var(--weight-heavy); letter-spacing: 0; }
+.hud .turn .of { font-family: var(--font-text); }
 .plain-button:active { transform: translateY(var(--press-depth)); box-shadow: var(--shadow-bronze-pressed); }
 .plain-button:disabled { filter: var(--filter-unlit); }
 
@@ -1217,6 +1218,7 @@ button.stat:disabled { filter: var(--filter-unlit); }
 }
 .choice b { font-family: var(--font-display); font-size: var(--type-2xl); font-weight: var(--weight-display); letter-spacing: var(--tracking-display); color: var(--color-torch-hot); text-shadow: var(--shadow-text-lit); }
 .choice span { font-size: var(--type-md); color: var(--color-text-dim); }
+.choice .choice-reason { font-weight: var(--weight-bold); color: var(--color-hp-text); }
 .choice-icon { width: var(--icon-xl); height: var(--icon-xl); color: var(--color-flame); }
 .choice:active { transform: translateY(var(--press-depth)); }
 .choice:disabled { filter: var(--filter-unlit); box-shadow: var(--shadow-plaque); }
@@ -1399,6 +1401,8 @@ button.stat:disabled { filter: var(--filter-unlit); }
 .relic-head .icon { width: var(--icon-md); height: var(--icon-md); color: var(--relic-edge); }
 .relic h3 { margin: 0; font-family: var(--font-display); font-size: var(--type-xl); font-weight: var(--weight-display); letter-spacing: var(--tracking-display); line-height: var(--leading-tight); color: var(--color-text); }
 .relic p { margin: 0; font-size: var(--type-md); line-height: var(--leading-text); color: var(--color-text-dim); }
+.relic .relic-count { color: var(--color-text); }
+.relic .relic-count b { color: var(--color-torch-hot); }
 .lasting { margin: 0; padding: 0 var(--space-5); display: flex; flex-direction: column; gap: var(--space-3); font-size: var(--type-md); color: var(--color-text-dim); }
 .lasting b { color: var(--color-text); }
 

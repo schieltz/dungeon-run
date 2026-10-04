@@ -29,6 +29,8 @@ export function createCombat(run, encounter, data) {
     gainedCurses: [], // curses that stay in the deck after the fight
     cleansed: false, // a sacrifice removed every curse; the run's deck loses them too when the fight settles
     companions: [...(run.companions ?? [])], // a mid-fight sacrifice removes one here; the run follows when the fight settles
+    relics: [...(run.relics ?? [])], // for relics that act during the fight (Tree Soul)
+    cardsPlayed: 0,
     gold: run.gold, // Golden Light spends it; the run gets it back when the fight settles
     shot: { bonuses: 0, energyNextTurn: 0 }, // Call Your Shot this turn
     kills: 0,
@@ -160,6 +162,7 @@ export function endPlayerTurn(combat) {
     actEnemy(combat, enemy);
     if (checkOutcome(combat)) return;
     if (firePassives(combat, 'afterAct', [enemy])) return;
+    if (endOfEnemyTurn(combat, enemy)) return;
   }
 
   if (resolveEndOfTurn(combat)) return;
@@ -196,6 +199,14 @@ function resolveEndOfTurn(combat) {
       if (effect.type === 'delayedDamage') takeDamage(combat, combat.player, effect.amount, card.name);
     }
   }
+  return checkOutcome(combat);
+}
+
+// The end of one enemy's turn: Tangled (any amount of it) costs it config "tangledDamage". Not a hit, so
+// block absorbs it but armor doesn't halve it. Returns true if that ended the fight.
+function endOfEnemyTurn(combat, enemy) {
+  if (enemy.hp <= 0 || !(enemy.statuses.tangled?.amount >= 1)) return false;
+  takeDamage(combat, enemy, combat.data.config.statusEffects.tangledDamage, 'Tangled');
   return checkOutcome(combat);
 }
 

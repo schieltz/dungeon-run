@@ -84,6 +84,26 @@
       "rarity": "rare",
       "text": "Start each fight with 2 Bone Walls already summoned.",
       "atFightStart": [{ "type": "summon", "id": "bone_wall", "count": 2 }]
+    },
+    {
+      "_comment": "The Ancient Tree's relics. eventOnly: never offered at random, only by the event.",
+      "id": "tree_soul",
+      "name": "Tree Soul",
+      "rarity": "rare",
+      "eventOnly": true,
+      "text": "Every 5 cards you play, deal 10 damage to a random enemy.",
+      "everyCardsPlayed": { "count": 5, "effects": [{ "type": "damage", "target": "randomEnemy", "amount": 10 }] }
+    },
+    {
+      "id": "bound_wood_creature",
+      "name": "Bound Wood Creature",
+      "rarity": "rare",
+      "eventOnly": true,
+      "text": "At the start of each fight, apply 1 Tangled to ALL enemies and deal 6 damage to ALL enemies. (An enemy with any Tangled takes 6 damage at the end of its turn.)",
+      "atFightStart": [
+        { "type": "status", "target": "allEnemies", "status": "tangled", "amount": 1, "lastsTheFight": true },
+        { "type": "damage", "target": "allEnemies", "amount": 6 }
+      ]
     }
   ]
 }

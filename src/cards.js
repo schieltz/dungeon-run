@@ -63,8 +63,9 @@ const EFFECTS = {
   },
   block: (ctx, effect) => gainBlock(ctx.combat, ctx.combat.player, effect.amount, ctx.source, { persists: effect.persists }),
   heal: (ctx, effect) => heal(ctx.combat, ctx.combat.player, effect.amount, ctx.source),
+  // "lastsTheFight": no duration at all (the Bound Wood Creature's Tangled).
   status: (ctx, effect) => {
-    const duration = effect.duration ?? ctx.combat.data.config.statusEffects.defaultDuration;
+    const duration = effect.lastsTheFight ? undefined : effect.duration ?? ctx.combat.data.config.statusEffects.defaultDuration;
     for (const target of targetsOf(ctx, effect)) {
       applyStatus(ctx.combat, target, effect.status, { duration, amount: effect.amount }, ctx.source);
     }
@@ -135,6 +136,19 @@ const EFFECTS = {
     record(ctx.combat, { kind: 'info', text: `${ctx.source} takes hold for the rest of the fight.` });
   },
 };
+
+// Relics that count the cards you play (Tree Soul): every "count" cards this fight, their effects fire.
+// Counted after a called shot is judged, so the relic's hit never muddles the call.
+function countCardPlayed(combat) {
+  combat.cardsPlayed = (combat.cardsPlayed ?? 0) + 1;
+  for (const id of combat.relics ?? []) {
+    const relic = combat.data.relicsById[id];
+    const every = relic?.everyCardsPlayed;
+    if (!every || combat.cardsPlayed % every.count !== 0) continue;
+    record(combat, { kind: 'info', text: `${relic.name} stirs: that's ${combat.cardsPlayed} cards played.` });
+    applyEffects(combat, every.effects, relic.name);
+  }
+}
 
 // Effects that come from something other than a card in hand: a relic or an event's lasting effect at the
 // start of a fight. They act as you, and anything aimed at one creature lands on you.
@@ -258,6 +272,7 @@ export function playCard(combat, cardUid, targetUid, payment, call) {
   const logStart = combat.log.length;
   runEffects(combat, card.effects, { card, source: card.name, target, payment });
   if (call !== undefined && canCallShot(card)) judgeCall(combat, card, target, call, logStart);
+  countCardPlayed(combat);
 
   // Where the card goes: exhausted cards leave for the fight, powers stay in play, the rest are discarded.
   if (card.exhaust) combat.piles.exhaust.push(instance);
